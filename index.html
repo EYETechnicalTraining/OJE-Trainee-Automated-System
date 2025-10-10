@@ -1,99 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Registration</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #555;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Registration</title>
+<style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; }
+    .container { background:white; padding:25px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:90%; max-width:600px; }
+    h1 { color:#333; }
+    p { color:#555; }
+    input { padding:10px; width:80%; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
+    .btn { background:#4CAF50; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; display:inline-block; margin-top:15px; text-decoration:none; }
+    .btn:hover { background:#45a049; }
+    .hidden { display:none; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Attendance Registration</h1>
-        <p id="message">Please allow location access to proceed.</p>
-        <a id="form-link" href="https://forms.office.com/r/1eRS2EfD7e" class="btn hidden" target="_blank">PROCEED</a>
+<div class="container">
+    <h1>Attendance Registration</h1>
+
+    <div id="registration-form">
+        <p>Please register once to continue:</p>
+        <input type="text" id="student-id" placeholder="Student ID" required><br>
+        <input type="text" id="student-name" placeholder="Full Name" required><br>
+        <button class="btn" onclick="registerStudent()">Register</button>
     </div>
 
-    <script>
-        const officeLat = 24.465868;
-        const officeLon = 54.375422;
-        const maxDistanceMeters = 50;
+    <p id="date-display" class="hidden"></p>
+    <p id="message" class="hidden">Please allow location access to proceed.</p>
+    <a id="form-link" class="btn hidden" target="_blank">PROCEED</a>
+</div>
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // radius of Earth in meters
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
+<script>
+const officeLat = 24.465868; // your office latitude
+const officeLon = 54.375422; // your office longitude
+const maxDistanceMeters = 50;
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const userLat = position.coords.latitude;
-                    const userLon = position.coords.longitude;
-                    const distance = getDistance(userLat, userLon, officeLat, officeLon);
+// Show today's date
+const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+document.getElementById('date-display').innerText = "Today's Date: " + today;
+document.getElementById('date-display').classList.remove('hidden');
 
-                    if (distance <= maxDistanceMeters) {
-                        document.getElementById('message').innerText = "You are within the Attendance area.";
-                        document.getElementById('form-link').classList.remove('hidden');
-                    } else {
-                        document.getElementById('message').innerText = "You are not within the allowed area. Please move closer to the office.";
-                    }
-                },
-                function(error) {
-                    document.getElementById('message').innerText = "Unable to get your location. Please allow location access.";
-                },
-                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 }
-            );
-        } else {
-            document.getElementById('message').innerText = "Geolocation is not supported by your browser.";
-        }
-    </script>
+// Check if student is already registered
+const storedData = JSON.parse(localStorage.getItem('studentData'));
+if(storedData){
+    document.getElementById('registration-form').classList.add('hidden');
+    startLocationVerification(storedData);
+}
+
+function registerStudent(){
+    const id = document.getElementById('student-id').value.trim();
+    const name = document.getElementById('student-name').value.trim();
+    if(!id || !name){ alert("Please fill in all fields"); return; }
+    const studentData = {id, name};
+    localStorage.setItem('studentData', JSON.stringify(studentData));
+    document.getElementById('registration-form').classList.add('hidden');
+    startLocationVerification(studentData);
+}
+
+function getDistance(lat1, lon1, lat2, lon2){
+    const R = 6371000;
+    const dLat = (lat2-lat1)*Math.PI/180;
+    const dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R*c;
+}
+
+function startLocationVerification(studentData){
+    const messageEl = document.getElementById('message');
+    const formLinkEl = document.getElementById('form-link');
+    messageEl.classList.remove('hidden');
+
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+            function(position){
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const distance = getDistance(userLat, userLon, officeLat, officeLon);
+
+                if(distance <= maxDistanceMeters){
+                    messageEl.innerText = "You are within the Attendance area.";
+
+                    // Generate prefilled Microsoft Forms URL
+                    const formBase = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
+                    const prefilledURL = `${formBase}&rb5a3b1867a594be49b4dac3724ffb60f=${encodeURIComponent(studentData.name)}&r5b6925327b93464693dcf63b96c0159a=${encodeURIComponent(studentData.id)}&r7a175eb6f3be41b4af0855ddda20d559=${encodeURIComponent(today)}`;
+
+                    formLinkEl.href = prefilledURL;
+                    formLinkEl.classList.remove('hidden');
+                } else {
+                    messageEl.innerText = "You are not within the allowed area. Please move closer to the office.";
+                }
+            },
+            function(error){
+                messageEl.innerText = "Unable to get your location. Please allow location access.";
+            },
+            {enableHighAccuracy:false, timeout:5000, maximumAge:10000}
+        );
+    } else {
+        messageEl.innerText = "Geolocation is not supported by your browser.";
+    }
+}
+</script>
 </body>
 </html>
