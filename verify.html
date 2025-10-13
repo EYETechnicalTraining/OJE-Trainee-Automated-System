@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verifying Access...</title>
+<style>
+  body{ font-family: Arial, sans-serif; background:#f4f4f9; margin:0; display:flex; align-items:center; justify-content:center; height:100vh; }
+  .box{ background:#fff; padding:28px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08); max-width:540px; text-align:center; }
+  h2{ margin:0 0 10px; color:#333; }
+  p{ margin:0; color:#555; }
+  .fail{ color:#b00020; font-weight:bold; }
+  .ok{ color:#2e7d32; font-weight:bold; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h2 id="status">Verifying access...</h2>
+    <p id="info">Please wait a moment.</p>
+  </div>
+
+<script>
+  // read params
+  const params = new URLSearchParams(window.location.search);
+  const auth = params.get('auth');
+  const formURL = params.get('form');
+
+  function deny(msg){
+    document.getElementById('status').innerText = "⚠ Access Denied";
+    document.getElementById('status').className = "fail";
+    document.getElementById('info').innerText = msg || "You must complete verification before accessing this form.";
+  }
+
+  if(!auth || !formURL){
+    deny("Missing verification token or form link.");
+  } else {
+    try {
+      const decoded = atob(auth);
+      // expected format: id|YYYY-MM-DD|verified
+      const parts = decoded.split('|');
+      if(parts.length !== 3) throw new Error("Invalid token");
+      const marker = parts[2];
+      const tokenDate = parts[1];
+
+      // optional: check tokenDate matches today in UTC+4 (UAE)
+      const now = new Date();
+      const uae = new Date(now.getTime() + (4*60*60*1000));
+      const todayUAE = uae.toISOString().split('T')[0];
+
+      // simple checks: contains 'verified' and date equals today (prevents reuse next day)
+      if(marker !== 'verified' || tokenDate !== todayUAE){
+        deny("Token invalid or expired. Please verify your location again.");
+      } else {
+        document.getElementById('status').innerText = "✅ Access Granted";
+        document.getElementById('status').className = "ok";
+        document.getElementById('info').innerText = "Redirecting to the attendance form...";
+        // short delay to show success
+        setTimeout(() => {
+          // redirect to the real prefilled form URL
+          window.location.href = decodeURIComponent(formURL);
+        }, 1200);
+      }
+    } catch(e){
+      deny("Token verification failed. Please verify your location again.");
+    }
+  }
+</script>
+</body>
+</html>
