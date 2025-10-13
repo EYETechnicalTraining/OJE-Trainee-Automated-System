@@ -124,12 +124,20 @@ function startLocationVerification(studentData){
 
                 if(distance <= maxDistanceMeters){
                     messageEl.innerText = "You are within the Attendance area.";
+
+                    // ✅ Generate prefilled Microsoft Forms URL
                     const formBase = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
                     const prefilledURL = `${formBase}&rb5a3b1867a594be49b4dac3724ffb60f=${encodeURIComponent(studentData.name)}&r5b6925327b93464693dcf63b96c0159a=${encodeURIComponent(studentData.id)}&r7a175eb6f3be41b4af0855ddda20d559=${encodeURIComponent(todayUAE)}`;
 
-                    formLinkEl.href = prefilledURL;
+                    // ✅ Create a short token and redirect via verify.html
+                    const token = btoa(`${studentData.id}|${todayUAE}|verified`);
+                    const redirectURL = `verify.html?auth=${encodeURIComponent(token)}&form=${encodeURIComponent(prefilledURL)}`;
+
+                    // ✅ Link to verify.html instead of form directly
+                    formLinkEl.href = redirectURL;
                     formLinkEl.classList.remove('hidden');
 
+                    // ✅ Mark submission for today
                     formLinkEl.addEventListener('click', () => {
                         localStorage.setItem('lastSubmission', todayUAE);
                     });
