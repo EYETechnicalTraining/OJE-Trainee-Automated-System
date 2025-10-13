@@ -14,7 +14,6 @@
     .btn:hover { background:#45a049; }
     .hidden { display:none; }
 
-    /* ✅ Success message styling */
     .success-box {
         background-color:#e6f9ed;
         color:#2e7d32;
@@ -24,6 +23,21 @@
         border-radius:8px;
         box-shadow:0 2px 6px rgba(0,0,0,0.1);
         font-weight:bold;
+    }
+
+    .info-box {
+        text-align:left;
+        background:#fafafa;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:15px;
+        margin-top:20px;
+    }
+
+    .info-box p {
+        font-size:16px;
+        margin:6px 0;
+        color:#333;
     }
 </style>
 </head>
@@ -40,7 +54,10 @@
 
     <p id="date-display" class="hidden"></p>
     <p id="message" class="hidden"></p>
-    <a id="form-link" class="btn hidden" target="_blank">PROCEED</a>
+
+    <!-- ✅ Info display -->
+    <div id="info-section" class="info-box hidden"></div>
+    <button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Submit Attendance</button>
 </div>
 
 <script>
@@ -48,15 +65,14 @@ const officeLat = 24.465868;
 const officeLon = 54.375422;
 const maxDistanceMeters = 5000;
 
-// Show today's date
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('date-display').innerText = "Today's Date: " + today;
 document.getElementById('date-display').classList.remove('hidden');
 
-// Get UAE time
+// UAE time utility
 function getUAETime() {
     const nowUTC = new Date();
-    const uaeOffset = 4 * 60; // UTC+4
+    const uaeOffset = 4 * 60;
     return new Date(nowUTC.getTime() + uaeOffset * 60000);
 }
 
@@ -100,7 +116,8 @@ function getDistance(lat1, lon1, lat2, lon2){
 
 function startLocationVerification(studentData){
     const messageEl = document.getElementById('message');
-    const formLinkEl = document.getElementById('form-link');
+    const infoSection = document.getElementById('info-section');
+    const submitBtn = document.getElementById('submit-btn');
     messageEl.classList.remove('hidden');
     messageEl.classList.remove('success-box');
 
@@ -111,7 +128,8 @@ function startLocationVerification(studentData){
     if (lastSubmission === todayUAE) {
         messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
         messageEl.classList.add('success-box');
-        formLinkEl.classList.add('hidden');
+        infoSection.classList.add('hidden');
+        submitBtn.classList.add('hidden');
         return;
     }
 
@@ -125,37 +143,78 @@ function startLocationVerification(studentData){
                 if(distance <= maxDistanceMeters){
                     messageEl.innerText = "You are within the Attendance area.";
 
-                    // ✅ Generate prefilled Microsoft Forms URL
-                    const formBase = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
-                    const prefilledURL = `${formBase}&rb5a3b1867a594be49b4dac3724ffb60f=${encodeURIComponent(studentData.name)}&r5b6925327b93464693dcf63b96c0159a=${encodeURIComponent(studentData.id)}&r7a175eb6f3be41b4af0855ddda20d559=${encodeURIComponent(todayUAE)}`;
-
-                    // ✅ Create a short token and redirect via verify.html
-                    const token = btoa(`${studentData.id}|${todayUAE}|verified`);
-                    const redirectURL = `verify.html?auth=${encodeURIComponent(token)}&form=${encodeURIComponent(prefilledURL)}`;
-
-                    // ✅ Link to verify.html instead of form directly
-                    formLinkEl.href = redirectURL;
-                    formLinkEl.classList.remove('hidden');
-
-                    // ✅ Mark submission for today
-                    formLinkEl.addEventListener('click', () => {
-                        localStorage.setItem('lastSubmission', todayUAE);
-                    });
+                    // Display data (not editable)
+                    infoSection.innerHTML = `
+                        <p><strong>Student ID:</strong> ${studentData.id}</p>
+                        <p><strong>Full Name:</strong> ${studentData.name}</p>
+                        <p><strong>Date:</strong> ${todayUAE}</p>
+                    `;
+                    infoSection.classList.remove('hidden');
+                    submitBtn.classList.remove('hidden');
                 } else {
                     messageEl.innerText = "You are not within the allowed area. Please move closer to the office.";
-                    formLinkEl.classList.add('hidden');
+                    infoSection.classList.add('hidden');
+                    submitBtn.classList.add('hidden');
                 }
             },
             function(error){
                 messageEl.innerText = "Unable to get your location. Please allow location access.";
-                formLinkEl.classList.add('hidden');
+                infoSection.classList.add('hidden');
+                submitBtn.classList.add('hidden');
             },
             {enableHighAccuracy:false, timeout:5000, maximumAge:10000}
         );
     } else {
         messageEl.innerText = "Geolocation is not supported by your browser.";
-        formLinkEl.classList.add('hidden');
+        infoSection.classList.add('hidden');
+        submitBtn.classList.add('hidden');
     }
+}
+
+function submitAttendance(){
+    const studentData = JSON.parse(localStorage.getItem('studentData'));
+    const nowUAE = getUAETime();
+    const todayUAE = nowUAE.toISOString().split('T')[0];
+
+    // Hidden form submission to Microsoft Forms
+    const form = document.createElement('form');
+    form.action = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
+    form.method = "POST";
+    form.target = "hiddenFrame";
+
+    const nameInput = document.createElement('input');
+    nameInput.type = "hidden";
+    nameInput.name = "rb5a3b1867a594be49b4dac3724ffb60f";
+    nameInput.value = studentData.name;
+    form.appendChild(nameInput);
+
+    const idInput = document.createElement('input');
+    idInput.type = "hidden";
+    idInput.name = "r5b6925327b93464693dcf63b96c0159a";
+    idInput.value = studentData.id;
+    form.appendChild(idInput);
+
+    const dateInput = document.createElement('input');
+    dateInput.type = "hidden";
+    dateInput.name = "r7a175eb6f3be41b4af0855ddda20d559";
+    dateInput.value = todayUAE;
+    form.appendChild(dateInput);
+
+    const iframe = document.createElement('iframe');
+    iframe.name = "hiddenFrame";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+
+    form.submit();
+
+    // Success message
+    localStorage.setItem('lastSubmission', todayUAE);
+    document.getElementById('info-section').classList.add('hidden');
+    document.getElementById('submit-btn').classList.add('hidden');
+    const messageEl = document.getElementById('message');
+    messageEl.innerText = "✅ Attendance submitted successfully!";
+    messageEl.classList.add('success-box');
 }
 </script>
 </body>
