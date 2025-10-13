@@ -2,10 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initia<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Attendance Registration</title>
 <style>
@@ -58,11 +54,8 @@
         50% { transform: translateY(-15px); }
     }
 
-    /* Bold date display */
-    #date-display {
-        font-weight:bold;
-        margin-top:10px;
-    }
+    /* Bold date style */
+    .bold-date { font-weight:bold; }
 </style>
 </head>
 <body>
@@ -76,7 +69,7 @@
         <button class="btn" onclick="registerStudent()">Register</button>
     </div>
 
-    <p id="date-display" class="hidden"></p>
+    <p id="date-display" class="hidden bold-date"></p>
     <p id="message" class="hidden"></p>
 
     <div id="info-section" class="info-box hidden"></div>
@@ -93,17 +86,15 @@ const officeLat = 24.465868;
 const officeLon = 54.375422;
 const maxDistanceMeters = 5000;
 
-// Function to format date like 10-Oct-2025
-function formatDisplayDate(date) {
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-GB', options);
+// Format date for display as DD-MMM-YYYY
+function formatDisplayDate(dateStr){
+    const options = { day:'2-digit', month:'short', year:'numeric' };
+    return new Date(dateStr).toLocaleDateString('en-GB', options);
 }
 
-// Today's date in both formats
-const todayISO = new Date().toISOString().split('T')[0]; // YYYY-MM-DD for MS Forms
-const todayDisplay = formatDisplayDate(new Date()); // e.g., 10-Oct-2025
-
-document.getElementById('date-display').innerText = todayDisplay;
+// Show today's date
+const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD for MS Forms
+document.getElementById('date-display').innerText = formatDisplayDate(today);
 document.getElementById('date-display').classList.remove('hidden');
 
 function getUAETime() {
@@ -205,233 +196,7 @@ function startLocationVerification(studentData){
                         infoSection.innerHTML = `
                             <p><strong>Student ID:</strong> ${studentData.id}</p>
                             <p><strong>Full Name:</strong> ${studentData.name}</p>
-                            <p><strong>Date:</strong> <strong>${todayDisplay}</strong></p>
-                        `;
-                        infoSection.classList.remove('hidden');
-                        submitBtn.classList.remove('hidden');
-                    } else {
-                        messageEl.innerText = "You are not within the allowed area. Please move closer to the office.";
-                        infoSection.classList.add('hidden');
-                        submitBtn.classList.add('hidden');
-                    }
-                }
-            } else {
-                messageEl.innerText = "Unable to get your location. Please allow location access.";
-                infoSection.classList.add('hidden');
-                submitBtn.classList.add('hidden');
-            }
-        }, 3000);
-    } else {
-        loadingAnim.style.display = "none";
-        messageEl.innerText = "Geolocation is not supported by your browser.";
-        infoSection.classList.add('hidden');
-        submitBtn.classList.add('hidden');
-    }
-}
-
-function submitAttendance(){
-    const studentData = JSON.parse(localStorage.getItem('studentData'));
-    const nowUAE = getUAETime();
-    const todayUAE = nowUAE.toISOString().split('T')[0]; // still YYYY-MM-DD for MS Forms
-
-    const form = document.createElement('form');
-    form.action = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
-    form.method = "POST";
-    form.target = "hiddenFrame";
-
-    const nameInput = document.createElement('input');
-    nameInput.type = "hidden";
-    nameInput.name = "rb5a3b1867a594be49b4dac3724ffb60f";
-    nameInput.value = studentData.name;
-    form.appendChild(nameInput);
-
-    const idInput = document.createElement('input');
-    idInput.type = "hidden";
-    idInput.name = "r5b6925327b93464693dcf63b96c0159a";
-    idInput.value = studentData.id;
-    form.appendChild(idInput);
-
-    const dateInput = document.createElement('input');
-    dateInput.type = "hidden";
-    dateInput.name = "r7a175eb6f3be41b4af0855ddda20d559";
-    dateInput.value = todayUAE;
-    form.appendChild(dateInput);
-
-    const iframe = document.createElement('iframe');
-    iframe.name = "hiddenFrame";
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
-    document.body.appendChild(form);
-
-    form.submit();
-
-    localStorage.setItem('lastSubmission', todayUAE);
-    document.getElementById('info-section').classList.add('hidden');
-    document.getElementById('submit-btn').classList.add('hidden');
-    const messageEl = document.getElementById('message');
-    messageEl.innerText = "✅ Attendance submitted successfully!";
-    messageEl.classList.add('success-box');
-}
-</script>
-</body>
-</html>
-l-scale=1.0">
-<title>Attendance Registration</title>
-<style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; }
-.container { background:white; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); width:90%; max-width:600px; }
-h1 { color:#333; }
-p { color:#555; }
-input { padding:10px; width:80%; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
-.btn { background:#4CAF50; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; display:inline-block; margin-top:15px; text-decoration:none; }
-.btn:hover { background:#45a049; }
-.hidden { display:none; }
-
-.success-box { background-color:#e6f9ed; color:#2e7d32; border:1px solid #a5d6a7; padding:15px; margin-top:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); font-weight:bold; }
-.info-box { text-align:left; background:#fafafa; border:1px solid #ddd; border-radius:8px; padding:15px; margin-top:20px; }
-.info-box p { font-size:16px; margin:6px 0; color:#333; }
-
-/* Radar animation */
-#loading-animation { display:none; position:relative; width:200px; height:200px; margin: 20px auto; border-radius:50%; background:radial-gradient(circle, rgba(0,255,0,0.1) 10%, rgba(0,0,0,0.8) 70%); box-shadow:0 0 15px rgba(0,255,0,0.5);}
-.radar-sweep { position:absolute; top:50%; left:50%; width:2px; height:100%; background-color:#00ff00; transform-origin:50% 100%; animation:sweep 2s linear infinite; }
-.radar-blip { position:absolute; top:50%; left:50%; width:10px; height:10px; background-color:#00ff00; border-radius:50%; animation:blip 1s infinite; }
-@keyframes sweep { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-@keyframes blip { 0% { transform:translate(-50%,-50%) scale(1); opacity:1; } 50% { transform:translate(-50%,-50%) scale(1.5); opacity:0.5; } 100% { transform:translate(-50%,-50%) scale(1); opacity:1; } }
-</style>
-</head>
-<body>
-<div class="container">
-    <h1>Attendance Registration</h1>
-
-    <div id="registration-form">
-        <p>Please register once to continue:</p>
-        <input type="text" id="student-id" placeholder="Student ID" required><br>
-        <input type="text" id="student-name" placeholder="Full Name" required><br>
-        <button class="btn" onclick="registerStudent()">Register</button>
-    </div>
-
-    <p id="date-display" class="hidden"></p>
-    <p id="message" class="hidden"></p>
-
-    <div id="info-section" class="info-box hidden"></div>
-    <button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Submit Attendance</button>
-
-    <!-- Radar animation -->
-    <div id="loading-animation">
-        <div class="radar-sweep"></div>
-        <div class="radar-blip"></div>
-    </div>
-</div>
-
-<script>
-const officeLat = 24.465868;
-const officeLon = 54.375422;
-const maxDistanceMeters = 5000;
-
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('date-display').innerText = "Today's Date: " + today;
-document.getElementById('date-display').classList.remove('hidden');
-
-function getUAETime() {
-    const nowUTC = new Date();
-    const uaeOffset = 4 * 60;
-    return new Date(nowUTC.getTime() + uaeOffset * 60000);
-}
-
-function checkAndResetAttendance() {
-    const storedDate = localStorage.getItem('lastSubmission');
-    if (!storedDate) return;
-    const now = getUAETime();
-    const todayUAE = now.toISOString().split('T')[0];
-    const resetTime = new Date(`${todayUAE}T06:00:00+04:00`);
-    if (now >= resetTime && storedDate !== todayUAE) {
-        localStorage.removeItem('lastSubmission');
-    }
-}
-checkAndResetAttendance();
-
-const storedData = JSON.parse(localStorage.getItem('studentData'));
-if (storedData) {
-    document.getElementById('registration-form').classList.add('hidden');
-    startLocationVerification(storedData);
-}
-
-function registerStudent(){
-    const id = document.getElementById('student-id').value.trim();
-    const name = document.getElementById('student-name').value.trim();
-    if(!id || !name){ alert("Please fill in all fields"); return; }
-    const studentData = {id, name};
-    localStorage.setItem('studentData', JSON.stringify(studentData));
-    document.getElementById('registration-form').classList.add('hidden');
-    startLocationVerification(studentData);
-}
-
-function getDistance(lat1, lon1, lat2, lon2){
-    const R = 6371000;
-    const dLat = (lat2-lat1)*Math.PI/180;
-    const dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R*c;
-}
-
-function startLocationVerification(studentData){
-    const messageEl = document.getElementById('message');
-    const infoSection = document.getElementById('info-section');
-    const submitBtn = document.getElementById('submit-btn');
-    const loadingAnim = document.getElementById('loading-animation');
-
-    messageEl.classList.remove('hidden');
-    messageEl.classList.remove('success-box');
-
-    const lastSubmission = localStorage.getItem('lastSubmission');
-    const nowUAE = getUAETime();
-    const todayUAE = nowUAE.toISOString().split('T')[0];
-
-    if (lastSubmission === todayUAE) {
-        messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
-        messageEl.classList.add('success-box');
-        infoSection.classList.add('hidden');
-        submitBtn.classList.add('hidden');
-        loadingAnim.style.display = "none";
-        return;
-    }
-
-    if(navigator.geolocation){
-        loadingAnim.style.display = "block";
-        messageEl.innerText = "Accessing your location… please wait";
-
-        let locationResult = null;
-
-        navigator.geolocation.getCurrentPosition(
-            function(position){
-                locationResult = position;
-            },
-            function(error){
-                locationResult = {error:true};
-            },
-            {enableHighAccuracy:false, timeout:5000, maximumAge:10000}
-        );
-
-        // Radar animation minimum 3 seconds
-        setTimeout(() => {
-            loadingAnim.style.display = "none";
-            if(locationResult){
-                if(locationResult.error){
-                    messageEl.innerText = "Unable to get your location. Please allow location access.";
-                    infoSection.classList.add('hidden');
-                    submitBtn.classList.add('hidden');
-                } else {
-                    const userLat = locationResult.coords.latitude;
-                    const userLon = locationResult.coords.longitude;
-                    const distance = getDistance(userLat, userLon, officeLat, officeLon);
-
-                    if(distance <= maxDistanceMeters){
-                        messageEl.innerText = "You are within the Attendance area.";
-                        infoSection.innerHTML = `
-                            <p><strong>Student ID:</strong> ${studentData.id}</p>
-                            <p><strong>Full Name:</strong> ${studentData.name}</p>
-                            <p><strong>Date:</strong> ${todayUAE}</p>
+                            <p><strong>Date:</strong> <span class="bold-date">${formatDisplayDate(todayUAE)}</span></p>
                         `;
                         infoSection.classList.remove('hidden');
                         submitBtn.classList.remove('hidden');
