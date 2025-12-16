@@ -24,21 +24,6 @@
         font-weight:bold;
     }
 
-    .info-box {
-        text-align:left;
-        background:#fafafa;
-        border:1px solid #ddd;
-        border-radius:8px;
-        padding:15px;
-        margin-top:20px;
-    }
-
-    .info-box p {
-        font-size:16px;
-        margin:6px 0;
-        color:#333;
-    }
-
     #loading-animation {
         display:none;
         margin-top:20px;
@@ -54,6 +39,7 @@
 </style>
 </head>
 <body>
+
 <div class="container">
     <h1>Attendance Registration</h1>
 
@@ -65,9 +51,7 @@
     </div>
 
     <p id="message" class="hidden"></p>
-
-    <div id="info-section" class="info-box hidden"></div>
-    <button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Submit Attendance</button>
+    <button id="submit-btn" class="btn hidden" onclick="goToForm()">Proceed to Attendance Form</button>
 
     <div id="loading-animation">
         <div class="pin">📍</div>
@@ -80,21 +64,22 @@ const officeLat = 24.435924784077514;
 const officeLon = 54.63383700803229;
 const maxDistanceMeters = 1000;
 
-// Get UAE time
+// UAE time
 function getUAETime() {
     const nowUTC = new Date();
-    const uaeOffset = 4 * 60;
-    return new Date(nowUTC.getTime() + uaeOffset * 60000);
+    return new Date(nowUTC.getTime() + 4 * 60 * 60000);
 }
 
-// Reset attendance at 6 AM UAE time
+// Reset at 6 AM UAE
 function checkAndResetAttendance() {
     const storedDate = localStorage.getItem('lastSubmission');
     if (!storedDate) return;
+
     const now = getUAETime();
-    const todayUAE = now.toISOString().split('T')[0];
-    const resetTime = new Date(`${todayUAE}T06:00:00+04:00`);
-    if (now >= resetTime && storedDate !== todayUAE) {
+    const today = now.toISOString().split('T')[0];
+    const resetTime = new Date(`${today}T06:00:00+04:00`);
+
+    if (now >= resetTime && storedDate !== today) {
         localStorage.removeItem('lastSubmission');
     }
 }
@@ -110,149 +95,82 @@ function registerStudent(){
     const id = document.getElementById('student-id').value.trim();
     const name = document.getElementById('student-name').value.trim();
     if(!id || !name){ alert("Please fill in all fields"); return; }
-    const studentData = {id, name};
-    localStorage.setItem('studentData', JSON.stringify(studentData));
+
+    localStorage.setItem('studentData', JSON.stringify({id, name}));
     document.getElementById('registration-form').classList.add('hidden');
-    startLocationVerification(studentData);
+    startLocationVerification({id, name});
 }
 
 function getDistance(lat1, lon1, lat2, lon2){
     const R = 6371000;
-    const dLat = (lat2-lat1)*Math.PI/180;
-    const dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R*c;
+    const dLat = (lat2-lat1) * Math.PI / 180;
+    const dLon = (lon2-lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat/2) ** 2 +
+        Math.cos(lat1*Math.PI/180) *
+        Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function startLocationVerification(studentData){
     const messageEl = document.getElementById('message');
-    const infoSection = document.getElementById('info-section');
     const submitBtn = document.getElementById('submit-btn');
     const loadingAnim = document.getElementById('loading-animation');
 
     messageEl.classList.remove('hidden');
     messageEl.classList.remove('success-box');
 
-    const lastSubmission = localStorage.getItem('lastSubmission');
-    const nowUAE = getUAETime();
-    const todayUAE = nowUAE.toISOString().split('T')[0];
-
-    if (lastSubmission === todayUAE) {
+    const today = getUAETime().toISOString().split('T')[0];
+    if (localStorage.getItem('lastSubmission') === today) {
         messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
         messageEl.classList.add('success-box');
-        infoSection.classList.add('hidden');
-        submitBtn.classList.add('hidden');
-        loadingAnim.style.display = "none";
         return;
     }
 
-    if(navigator.geolocation){
-        loadingAnim.style.display = "block";
-        messageEl.innerText = "Accessing your location… please wait";
+    loadingAnim.style.display = "block";
+    messageEl.innerText = "Accessing your location… please wait";
 
-        let locationResult = null;
-
-        navigator.geolocation.getCurrentPosition(
-            function(position){
-                locationResult = position;
-            },
-            function(error){
-                locationResult = {error:true};
-            },
-            {enableHighAccuracy:false, timeout:5000, maximumAge:10000}
-        );
-
-        setTimeout(() => {
+    navigator.geolocation.getCurrentPosition(
+        pos => {
             loadingAnim.style.display = "none";
+            const distance = getDistance(
+                pos.coords.latitude,
+                pos.coords.longitude,
+                officeLat,
+                officeLon
+            );
 
-            if(locationResult){
-                if(locationResult.error){
-                    messageEl.innerText = "Unable to get your location. Please allow location access.";
-                    infoSection.classList.add('hidden');
-                    submitBtn.classList.add('hidden');
-                } else {
-                    const userLat = locationResult.coords.latitude;
-                    const userLon = locationResult.coords.longitude;
-                    const distance = getDistance(userLat, userLon, officeLat, officeLon);
-
-                    if(distance <= maxDistanceMeters){
-                        messageEl.innerText = "You are within the Attendance area!";
-
-                        const options = { day: '2-digit', month: 'short', year: 'numeric' };
-                        const displayDate = new Date().toISOString().split('T')[0];
-                        const formattedDate = new Date(displayDate).toLocaleDateString('en-GB', options);
-
-                        infoSection.innerHTML = `
-                            <p><strong>Student ID:</strong> ${studentData.id}</p>
-                            <p><strong>Full Name:</strong> ${studentData.name}</p>
-                            <p><strong>Date:</strong> ${formattedDate}</p>
-                        `;
-                        infoSection.classList.remove('hidden');
-                        submitBtn.classList.remove('hidden');
-                    } else {
-                        messageEl.innerText = "You are not within the allowed area. Please move closer to the office.";
-                        infoSection.classList.add('hidden');
-                        submitBtn.classList.add('hidden');
-                    }
-                }
+            if (distance <= maxDistanceMeters) {
+                messageEl.innerText = "You are within the Attendance area!";
+                submitBtn.classList.remove('hidden');
             } else {
-                messageEl.innerText = "Unable to get your location. Please allow location access.";
-                infoSection.classList.add('hidden');
-                submitBtn.classList.add('hidden');
+                messageEl.innerText = "You are not within the allowed area.";
             }
-        }, 3000);
-    } else {
-        loadingAnim.style.display = "none";
-        messageEl.innerText = "Geolocation is not supported by your browser.";
-        infoSection.classList.add('hidden');
-        submitBtn.classList.add('hidden');
-    }
+        },
+        () => {
+            loadingAnim.style.display = "none";
+            messageEl.innerText = "Unable to access your location.";
+        },
+        { timeout: 5000 }
+    );
 }
 
-function submitAttendance(){
+function goToForm(){
     const studentData = JSON.parse(localStorage.getItem('studentData'));
-    const nowUAE = getUAETime();
-    const todayUAE = nowUAE.toISOString().split('T')[0];
+    const today = getUAETime().toISOString().split('T')[0];
 
-    const form = document.createElement('form');
-    form.action = "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u";
-    form.method = "POST";
-    form.target = "hiddenFrame";
+    localStorage.setItem('lastSubmission', today);
 
-    const nameInput = document.createElement('input');
-    nameInput.type = "hidden";
-    nameInput.name = "rb5a3b1867a594be49b4dac3724ffb60f";
-    nameInput.value = studentData.name;
-    form.appendChild(nameInput);
+    const formUrl =
+        "https://forms.office.com/Pages/ResponsePage.aspx?id=go0NyWGKG0KfjDWri8W8nLDyzzJGlihFvj_UvRAMtoxUNjFJUE03QU0zTjNLVk42NEQ0N0ZSUjkwSS4u" +
+        "&rb5a3b1867a594be49b4dac3724ffb60f=" + encodeURIComponent(studentData.name) +
+        "&r5b6925327b93464693dcf63b96c0159a=" + encodeURIComponent(studentData.id) +
+        "&r7a175eb6f3be41b4af0855ddda20d559=" + encodeURIComponent(today);
 
-    const idInput = document.createElement('input');
-    idInput.type = "hidden";
-    idInput.name = "r5b6925327b93464693dcf63b96c0159a";
-    idInput.value = studentData.id;
-    form.appendChild(idInput);
-
-    const dateInput = document.createElement('input');
-    dateInput.type = "hidden";
-    dateInput.name = "r7a175eb6f3be41b4af0855ddda20d559";
-    dateInput.value = todayUAE;
-    form.appendChild(dateInput);
-
-    const iframe = document.createElement('iframe');
-    iframe.name = "hiddenFrame";
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
-    document.body.appendChild(form);
-
-    form.submit();
-
-    localStorage.setItem('lastSubmission', todayUAE);
-    document.getElementById('info-section').classList.add('hidden');
-    document.getElementById('submit-btn').classList.add('hidden');
-    const messageEl = document.getElementById('message');
-    messageEl.innerText = "✅ Attendance submitted successfully!";
-    messageEl.classList.add('success-box');
+    window.location.href = formUrl;
 }
 </script>
+
 </body>
 </html>
