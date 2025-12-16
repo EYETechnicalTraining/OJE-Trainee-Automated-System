@@ -53,6 +53,12 @@
     #attendance-review p {
         margin: 8px 0;
     }
+
+    /* Center the Submit Attendance button */
+    #attendance-review button {
+        display: block;
+        margin: 20px auto 0 auto;
+    }
 </style>
 </head>
 <body>
@@ -76,7 +82,7 @@
 
     <!-- New attendance review container -->
     <div id="attendance-review">
-        <h2>Confirm Your Attendance Details</h2>
+        <h2>Trainee Details</h2>
         <p><strong>Trainee Name:</strong> <span id="review-name"></span></p>
         <p><strong>Trainee ID:</strong> <span id="review-id"></span></p>
         <p><strong>Check In:</strong> <span id="review-datetime"></span></p>
@@ -207,16 +213,16 @@ function startLocationVerification(studentData) {
             );
 
             if (distance <= maxDistanceMeters) {
-                messageEl.innerText = "You are within the Attendance area! ⚠️";
+                messageEl.innerText = "You are within the Attendance area!";
                 document.getElementById("submit-btn").classList.remove("hidden");
             } else {
-                messageEl.innerText = "You are not within the allowed area.";
+                messageEl.innerText = "You are not within the allowed area⚠️";
                 document.getElementById("submit-btn").classList.add("hidden");
             }
         },
         () => {
             loadingAnim.style.display = "none";
-            messageEl.innerText = "Unable to access your location.";
+            messageEl.innerText = "Unable to access your location. Please refresh!";
             document.getElementById("submit-btn").classList.add("hidden");
         },
         { timeout: 5000 }
