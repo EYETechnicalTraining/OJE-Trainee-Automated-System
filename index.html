@@ -237,6 +237,9 @@ function showAttendanceReview() {
     }
     const now = getUAETime();
 
+    // Subtract 4 hours from now for display only
+    const displayTime = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+
     // Hide main submit button and message
     document.getElementById("submit-btn").classList.add("hidden");
     document.getElementById("message").classList.add("hidden");
@@ -248,7 +251,7 @@ function showAttendanceReview() {
     // Fill in details
     document.getElementById("review-name").innerText = studentData.name;
     document.getElementById("review-id").innerText = studentData.id;
-    document.getElementById("review-datetime").innerText = now.toLocaleString();
+    document.getElementById("review-datetime").innerText = displayTime.toLocaleString();
 }
 
 function getUAEISOString() {
