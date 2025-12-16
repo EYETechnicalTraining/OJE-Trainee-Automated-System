@@ -5,164 +5,236 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Attendance Registration</title>
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; }
-.container { background:white; padding:25px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:90%; max-width:600px; }
-h1 { color:#333; }
-input { padding:10px; width:80%; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
-.btn { background:#4CAF50; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; display:inline-block; margin-top:15px; text-decoration:none; }
-.btn:hover { background:#45a049; }
-.hidden { display:none; }
-.success-box { background-color:#e6f9ed; color:#2e7d32; border:1px solid #a5d6a7; padding:15px; margin-top:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); font-weight:bold; }
-#loading-animation { display:none; margin-top:20px; }
-#loading-animation .pin { font-size:50px; animation:bounce 1s infinite; }
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; }
+    .container { background:white; padding:25px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:90%; max-width:600px; }
+    h1 { color:#333; }
+    input { padding:10px; width:80%; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
+    .btn { background:#4CAF50; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; display:inline-block; margin-top:15px; text-decoration:none; }
+    .btn:hover { background:#45a049; }
+    .hidden { display:none; }
+
+    .success-box {
+        background-color:#e6f9ed;
+        color:#2e7d32;
+        border:1px solid #a5d6a7;
+        padding:15px;
+        margin-top:20px;
+        border-radius:8px;
+        box-shadow:0 2px 6px rgba(0,0,0,0.1);
+        font-weight:bold;
+    }
+
+    #loading-animation {
+        display:none;
+        margin-top:20px;
+    }
+    #loading-animation .pin {
+        font-size:50px;
+        animation:bounce 1s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
 </style>
 </head>
 <body>
+
 <div class="container">
-<h1>Attendance Registration</h1>
-<div id="registration-form">
-<p>Please register once to continue:</p>
-<input type="text" id="student-id" placeholder="Student ID" required /><br />
-<input type="text" id="student-name" placeholder="Full Name" required /><br />
-<input type="email" id="student-email" placeholder="Email Address" required /><br />
-<button class="btn" onclick="registerStudent()">Register</button>
+    <h1>Attendance Registration</h1>
+
+    <div id="registration-form">
+        <p>Please register once to continue:</p>
+        <input type="text" id="student-id" placeholder="Student ID" required /><br />
+        <input type="text" id="student-name" placeholder="Full Name" required /><br />
+        <input type="email" id="student-email" placeholder="Email Address" required /><br />
+        <button class="btn" onclick="registerStudent()">Register</button>
+    </div>
+
+    <p id="message" class="hidden"></p>
+    <button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Mark Attendance</button>
+
+    <div id="loading-animation">
+        <div class="pin">📍</div>
+        <p>Accessing your location… please wait</p>
+    </div>
 </div>
-<p id="message" class="hidden"></p>
-<button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Mark Attendance</button>
-<div id="loading-animation">
-<div class="pin">📍</div>
-<p>Accessing your location… please wait</p>
-</div>
-</div>
+
 <script>
 const officeLat = 24.435924784077514;
 const officeLon = 54.63383700803229;
 const maxDistanceMeters = 1000;
 
-const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1";
+// Registration Power Automate flow URL
+const registrationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4c134c74b3cf4e10bb06058aece18852/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V_0WhaILSfvNqYIVGEsGVvREB13K5H3zviFW1JeCvEw";
 
+// Attendance Power Automate flow URL
+const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
+
+// UAE time function
 function getUAETime() {
-  const nowUTC = new Date();
-  return new Date(nowUTC.getTime() + 4 * 60 * 60000);
+    const nowUTC = new Date();
+    return new Date(nowUTC.getTime() + 4 * 60 * 60000);
 }
 
+// Reset at 6 AM UAE
 function checkAndResetAttendance() {
-  const storedDate = localStorage.getItem("lastSubmission");
-  if (!storedDate) return;
-  const now = getUAETime();
-  const today = now.toISOString().split("T")[0];
-  const resetTime = new Date(`${today}T06:00:00+04:00`);
-  if (now >= resetTime && storedDate !== today) {
-    localStorage.removeItem("lastSubmission");
-  }
+    const storedDate = localStorage.getItem("lastSubmission");
+    if (!storedDate) return;
+
+    const now = getUAETime();
+    const today = now.toISOString().split("T")[0];
+    const resetTime = new Date(`${today}T06:00:00+04:00`);
+
+    if (now >= resetTime && storedDate !== today) {
+        localStorage.removeItem("lastSubmission");
+    }
 }
 checkAndResetAttendance();
 
 const storedData = JSON.parse(localStorage.getItem("studentData"));
 if (storedData) {
-  document.getElementById("registration-form").classList.add("hidden");
-  startLocationVerification(storedData);
+    document.getElementById("registration-form").classList.add("hidden");
+    startLocationVerification(storedData);
 }
 
 function registerStudent() {
-  const id = document.getElementById("student-id").value.trim();
-  const name = document.getElementById("student-name").value.trim();
-  const email = document.getElementById("student-email").value.trim();
-  if (!id || !name || !email) {
-    alert("Please fill in all fields");
-    return;
-  }
-  const studentData = { id, name, email };
-  localStorage.setItem("studentData", JSON.stringify(studentData));
-  document.getElementById("registration-form").classList.add("hidden");
-  startLocationVerification(studentData);
+    const id = document.getElementById("student-id").value.trim();
+    const name = document.getElementById("student-name").value.trim();
+    const email = document.getElementById("student-email").value.trim();
+    if (!id || !name || !email) {
+        alert("Please fill in all fields");
+        return;
+    }
+
+    const studentData = { id, name, email };
+    localStorage.setItem("studentData", JSON.stringify(studentData));
+    document.getElementById("registration-form").classList.add("hidden");
+
+    // Send registration data to registration flow
+    sendRegistrationToFlow(studentData);
+
+    startLocationVerification(studentData);
+}
+
+function sendRegistrationToFlow(studentData) {
+    fetch(registrationFlowUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            StudentID: studentData.id,
+            FullName: studentData.name,
+            Email: studentData.email
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error("Failed to send registration data to flow.");
+        }
+    })
+    .catch(error => {
+        console.error("Error sending registration data to flow:", error);
+    });
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function startLocationVerification(studentData) {
-  const messageEl = document.getElementById("message");
-  const submitBtn = document.getElementById("submit-btn");
-  const loadingAnim = document.getElementById("loading-animation");
-  messageEl.classList.remove("hidden");
-  messageEl.classList.remove("success-box");
-  const today = getUAETime().toISOString().split("T")[0];
-  if (localStorage.getItem("lastSubmission") === today) {
-    messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
-    messageEl.classList.add("success-box");
-    return;
-  }
-  loadingAnim.style.display = "block";
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      loadingAnim.style.display = "none";
-      const distance = getDistance(
-        pos.coords.latitude,
-        pos.coords.longitude,
-        officeLat,
-        officeLon
-      );
-      if (distance <= maxDistanceMeters) {
-        messageEl.innerText = "You are within the Attendance area! ⚠️";
-        submitBtn.classList.remove("hidden");
-      } else {
-        messageEl.innerText = "You are not within the allowed area.";
-        submitBtn.classList.add("hidden");
-      }
-    },
-    () => {
-      loadingAnim.style.display = "none";
-      messageEl.innerText = "Unable to access your location.";
-      submitBtn.classList.add("hidden");
-    },
-    { timeout: 5000 }
-  );
+    const messageEl = document.getElementById("message");
+    const submitBtn = document.getElementById("submit-btn");
+    const loadingAnim = document.getElementById("loading-animation");
+
+    messageEl.classList.remove("hidden");
+    messageEl.classList.remove("success-box");
+
+    const today = getUAETime().toISOString().split("T")[0];
+    if (localStorage.getItem("lastSubmission") === today) {
+        messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
+        messageEl.classList.add("success-box");
+        return;
+    }
+
+    loadingAnim.style.display = "block";
+    messageEl.innerText = "Accessing your location… please wait";
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            loadingAnim.style.display = "none";
+            const distance = getDistance(
+                pos.coords.latitude,
+                pos.coords.longitude,
+                officeLat,
+                officeLon
+            );
+
+            if (distance <= maxDistanceMeters) {
+                messageEl.innerText = "You are within the Attendance area! ⚠️";
+                submitBtn.classList.remove("hidden");
+            } else {
+                messageEl.innerText = "You are not within the allowed area ";
+                submitBtn.classList.add("hidden");
+            }
+        },
+        () => {
+            loadingAnim.style.display = "none";
+            messageEl.innerText = "Unable to access your location.";
+            submitBtn.classList.add("hidden");
+        },
+        { timeout: 5000 }
+    );
 }
 
 function submitAttendance() {
-  const studentData = JSON.parse(localStorage.getItem("studentData"));
-  const now = getUAETime();
-  const today = now.toISOString().split("T")[0];
-  if (localStorage.getItem("lastSubmission") === today) {
-    alert("You have already marked attendance for today.");
-    return;
-  }
-  if (!studentData) {
-    alert("Please register first.");
-    return;
-  }
+    const studentData = JSON.parse(localStorage.getItem("studentData"));
+    const now = getUAETime();
+    const today = now.toISOString().split("T")[0];
 
-  const attendanceData = {
-    Student: studentData.name,
-    StudentID: studentData.id,
-    DateTime: now.toISOString()
-  };
+    if (localStorage.getItem("lastSubmission") === today) {
+        alert("You have already marked attendance for today.");
+        return;
+    }
+    if (!studentData) {
+        alert("Please register first.");
+        return;
+    }
 
-  fetch(attendanceFlowUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(attendanceData)
-  })
-  .then(response => {
-    if (!response.ok) throw new Error("Failed to submit attendance");
-    return response.json();
-  })
-  .then(() => {
-    localStorage.setItem("lastSubmission", today);
-    document.getElementById("message").innerText = "✅ Attendance submitted successfully! 😊";
-    document.getElementById("submit-btn").classList.add("hidden");
-  })
-  .catch(err => {
-    alert("Error submitting attendance: " + err.message);
-  });
+    const attendanceData = {
+        Student: studentData.name,
+        StudentID: studentData.id,
+        DateTime: now.toISOString()
+    };
+
+    fetch(attendanceFlowUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(attendanceData)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Failed to submit attendance");
+        return response.json();
+    })
+    .then(() => {
+        localStorage.setItem("lastSubmission", today);
+        document.getElementById("message").innerText = "✅ Attendance submitted successfully! 😊";
+        document.getElementById("submit-btn").classList.add("hidden");
+    })
+    .catch(err => {
+        alert("Error submitting attendance: " + err.message);
+    });
 }
 </script>
+
 </body>
 </html>
