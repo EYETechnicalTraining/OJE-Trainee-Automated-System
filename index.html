@@ -200,7 +200,7 @@ function startLocationVerification(studentData) {
     }
 
     loadingAnim.style.display = "block";
-    messageEl.innerText = "Accessing your location… please wait";
+    messageEl.innerText = " ";
 
     navigator.geolocation.getCurrentPosition(
         pos => {
