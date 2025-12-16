@@ -36,11 +36,29 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-15px); }
     }
+
+    /* New styles for attendance review container */
+    #attendance-review {
+        display: none;
+        text-align: left;
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f0f8ff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        font-size: 16px;
+    }
+
+    #attendance-review p {
+        margin: 8px 0;
+    }
 </style>
 </head>
 <body>
 
 <div class="container">
+
     <h1>Attendance Registration</h1>
 
     <div id="registration-form">
@@ -52,7 +70,18 @@
     </div>
 
     <p id="message" class="hidden"></p>
-    <button id="submit-btn" class="btn hidden" onclick="submitAttendance()">Mark Attendance</button>
+
+    <!-- Changed button text to 'Review Attendance' and onclick -->
+    <button id="submit-btn" class="btn hidden" onclick="showAttendanceReview()">Mark Attendance</button>
+
+    <!-- New attendance review container -->
+    <div id="attendance-review">
+        <h2>Confirm Your Attendance Details</h2>
+        <p><strong>Trainee Name:</strong> <span id="review-name"></span></p>
+        <p><strong>Trainee ID:</strong> <span id="review-id"></span></p>
+        <p><strong>Check In:</strong> <span id="review-datetime"></span></p>
+        <button class="btn" onclick="submitAttendance()">Submit Attendance</button>
+    </div>
 
     <div id="loading-animation">
         <div class="pin">📍</div>
@@ -179,19 +208,41 @@ function startLocationVerification(studentData) {
 
             if (distance <= maxDistanceMeters) {
                 messageEl.innerText = "You are within the Attendance area! ⚠️";
-                submitBtn.classList.remove("hidden");
+                document.getElementById("submit-btn").classList.remove("hidden");
             } else {
                 messageEl.innerText = "You are not within the allowed area.";
-                submitBtn.classList.add("hidden");
+                document.getElementById("submit-btn").classList.add("hidden");
             }
         },
         () => {
             loadingAnim.style.display = "none";
             messageEl.innerText = "Unable to access your location.";
-            submitBtn.classList.add("hidden");
+            document.getElementById("submit-btn").classList.add("hidden");
         },
         { timeout: 5000 }
     );
+}
+
+function showAttendanceReview() {
+    const studentData = JSON.parse(localStorage.getItem("studentData"));
+    if (!studentData) {
+        alert("Please register first.");
+        return;
+    }
+    const now = getUAETime();
+
+    // Hide main submit button and message
+    document.getElementById("submit-btn").classList.add("hidden");
+    document.getElementById("message").classList.add("hidden");
+
+    // Show attendance review container
+    const reviewDiv = document.getElementById("attendance-review");
+    reviewDiv.style.display = "block";
+
+    // Fill in details
+    document.getElementById("review-name").innerText = studentData.name;
+    document.getElementById("review-id").innerText = studentData.id;
+    document.getElementById("review-datetime").innerText = now.toLocaleString();
 }
 
 function submitAttendance() {
@@ -224,8 +275,10 @@ function submitAttendance() {
     })
     .then(() => {
         localStorage.setItem("lastSubmission", today);
+        // Hide attendance review after success
+        document.getElementById("attendance-review").style.display = "none";
         document.getElementById("message").innerText = "✅ Attendance submitted successfully! 😊";
-        document.getElementById("submit-btn").classList.add("hidden");
+        document.getElementById("message").classList.remove("hidden");
     })
     .catch(err => {
         alert("Error submitting attendance: " + err.message);
