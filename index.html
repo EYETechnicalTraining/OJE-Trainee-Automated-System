@@ -40,16 +40,13 @@ const officeLat = 24.435924784077514;
 const officeLon = 54.63383700803229;
 const maxDistanceMeters = 1000;
 
-// **Your Power Automate flow URL for attendance submission**
 const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1";
 
-// UAE time function
 function getUAETime() {
   const nowUTC = new Date();
   return new Date(nowUTC.getTime() + 4 * 60 * 60000);
 }
 
-// Reset at 6 AM UAE
 function checkAndResetAttendance() {
   const storedDate = localStorage.getItem("lastSubmission");
   if (!storedDate) return;
@@ -103,7 +100,6 @@ function startLocationVerification(studentData) {
     return;
   }
   loadingAnim.style.display = "block";
-  messageEl.innerText = "Accessing your location… please wait";
   navigator.geolocation.getCurrentPosition(
     pos => {
       loadingAnim.style.display = "none";
@@ -130,7 +126,6 @@ function startLocationVerification(studentData) {
   );
 }
 
-// UPDATED FUNCTION - sends data directly to your Power Automate flow
 function submitAttendance() {
   const studentData = JSON.parse(localStorage.getItem("studentData"));
   const now = getUAETime();
