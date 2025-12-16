@@ -65,19 +65,17 @@ const officeLat = 24.435924784077514;
 const officeLon = 54.63383700803229;
 const maxDistanceMeters = 1000;
 
-// Registration Power Automate flow URL
+// Registration Flow URL
 const registrationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4c134c74b3cf4e10bb06058aece18852/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V_0WhaILSfvNqYIVGEsGVvREB13K5H3zviFW1JeCvEw";
 
-// Attendance Power Automate flow URL
+// Attendance Flow URL
 const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
-// UAE time function
 function getUAETime() {
     const nowUTC = new Date();
     return new Date(nowUTC.getTime() + 4 * 60 * 60000);
 }
 
-// Reset at 6 AM UAE
 function checkAndResetAttendance() {
     const storedDate = localStorage.getItem("lastSubmission");
     if (!storedDate) return;
@@ -111,7 +109,7 @@ function registerStudent() {
     localStorage.setItem("studentData", JSON.stringify(studentData));
     document.getElementById("registration-form").classList.add("hidden");
 
-    // Send registration data to registration flow
+    // Trigger registration flow
     sendRegistrationToFlow(studentData);
 
     startLocationVerification(studentData);
@@ -183,7 +181,7 @@ function startLocationVerification(studentData) {
                 messageEl.innerText = "You are within the Attendance area! ⚠️";
                 submitBtn.classList.remove("hidden");
             } else {
-                messageEl.innerText = "You are not within the allowed area ";
+                messageEl.innerText = "You are not within the allowed area.";
                 submitBtn.classList.add("hidden");
             }
         },
@@ -200,7 +198,6 @@ function submitAttendance() {
     const studentData = JSON.parse(localStorage.getItem("studentData"));
     const now = getUAETime();
     const today = now.toISOString().split("T")[0];
-
     if (localStorage.getItem("lastSubmission") === today) {
         alert("You have already marked attendance for today.");
         return;
@@ -223,7 +220,7 @@ function submitAttendance() {
     })
     .then(response => {
         if (!response.ok) throw new Error("Failed to submit attendance");
-        return response.json();
+        return; // Skip parsing JSON because flow returns empty response
     })
     .then(() => {
         localStorage.setItem("lastSubmission", today);
