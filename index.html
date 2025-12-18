@@ -125,6 +125,9 @@ const resetClearPermissionFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5
 // NEW URL for Delete Registration from SharePoint
 const deleteRegistrationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/5791e0771af14cbea1ef5d523fe60c98/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3uu1u056-McIeaN9b5ns_zvGtGg-0gkJI4DqDg1Tyrc";
 
+// --- ADDED: Validation Flow URL ---
+const validationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d2fd8d79a22c4ea5ada0c512eaac3257/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QN_nV-ZLNHyUGxSBgC5sM2VSp5o1_Uqohoevm5bKRXk";
+
 function getUAETime() {
     const nowUTC = new Date();
     return new Date(nowUTC.getTime() + 4 * 60 * 60000);
@@ -151,7 +154,8 @@ if (storedData) {
     checkClearPermission(storedData.id);   // <-- added this call here as per your request
 }
 
-function registerStudent() {
+// --- UPDATED registerStudent function ---
+async function registerStudent() {
     const id = document.getElementById("student-id").value.trim();
     const name = document.getElementById("student-name").value.trim();
     const email = document.getElementById("student-email").value.trim();
@@ -160,14 +164,36 @@ function registerStudent() {
         return;
     }
 
-    const studentData = { id, name, email };
-    localStorage.setItem("studentData", JSON.stringify(studentData));
-    document.getElementById("registration-form").classList.add("hidden");
+    try {
+        const response = await fetch(validationFlowUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ StudentID: id, FullName: name, Email: email })
+        });
 
-    // Trigger registration flow
-    sendRegistrationToFlow(studentData);
+        if (!response.ok) {
+            alert("Validation service unavailable. Please try again.");
+            return;
+        }
 
-    startLocationVerification(studentData);
+        const result = await response.json();
+
+        if (!result.valid) {
+            alert(result.message || "Your input details don't exist/matches our database.");
+            return;
+        }
+
+        // Validation passed: save and continue registration flow
+        const studentData = { id, name, email };
+        localStorage.setItem("studentData", JSON.stringify(studentData));
+        document.getElementById("registration-form").classList.add("hidden");
+
+        sendRegistrationToFlow(studentData);
+        startLocationVerification(studentData);
+
+    } catch (error) {
+        alert("Error during validation: " + error.message);
+    }
 }
 
 function sendRegistrationToFlow(studentData) {
