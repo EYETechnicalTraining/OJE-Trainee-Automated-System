@@ -284,7 +284,7 @@ function submitAttendance() {
     const attendanceData = {
         Student: studentData.name,
         StudentID: studentData.id,
-        DateTime: now.toISOString().slice(0,19)  // <<<<< Changed this line ONLY
+        DateTime: now.toISOString().slice(0,19),  // <<<<< Changed this line ONLY
         Email: studentData.email
     };
 
