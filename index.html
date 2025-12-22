@@ -40,6 +40,9 @@
     <label><input type="checkbox" id="show-password"> Show Password</label>
 
     <button id="btn-send-otp" disabled>Send OTP</button>
+
+    <!-- New Login Button Added Below -->
+    <button id="btn-go-to-login" style="background-color:#003366; color:white; margin-top:10px;">Login</button>
     
     <p id="reg-message" class="message hidden"></p>
   </div>
@@ -337,6 +340,12 @@ document.getElementById('btn-login').addEventListener('click', async () => {
 // Show login form when user clicks Register Instead
 document.getElementById('btn-to-register').addEventListener('click', () => {
   showSection('registration-section');
+});
+
+// *** NEW: Show login form when clicking the new Login button on Registration page ***
+document.getElementById('btn-go-to-login').addEventListener('click', () => {
+  showSection('login-section');
+  clearMessages();
 });
 
 // === Load Attendance Details ===
