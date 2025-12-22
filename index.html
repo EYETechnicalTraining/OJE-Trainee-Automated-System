@@ -1,411 +1,423 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Attendance Registration</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OJE Attendance System</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; }
-    .container { background:white; padding:25px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:90%; max-width:600px; }
-    h1 { color:#333; }
-    input { padding:10px; width:80%; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
-    .btn { background:#4CAF50; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; display:inline-block; margin-top:15px; text-decoration:none; }
-    .btn:hover { background:#45a049; }
-    .hidden { display:none; }
-
-    .success-box {
-        background-color:#e6f9ed;
-        color:#2e7d32;
-        border:1px solid #a5d6a7;
-        padding:15px;
-        margin-top:20px;
-        border-radius:8px;
-        box-shadow:0 2px 6px rgba(0,0,0,0.1);
-        font-weight:bold;
-    }
-
-    #loading-animation {
-        display:none;
-        margin-top:20px;
-    }
-    #loading-animation .pin {
-        font-size:50px;
-        animation:bounce 1s infinite;
-    }
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-
-    /* New styles for attendance review container */
-    #attendance-review {
-        display: none;
-        text-align: left;
-        margin-top: 20px;
-        padding: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #f0f8ff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        font-size: 16px;
-    }
-
-    #attendance-review p {
-        margin: 8px 0;
-    }
-
-    /* Center the Submit Attendance button */
-    #attendance-review button {
-        display: block;
-        margin: 20px auto 0 auto;
-    }
-
-    /* Changed Clear Registration button color to red */
-    #clear-btn {
-        background-color: #e53935; /* red */
-        color: white;
-    }
-    #clear-btn:hover {
-        background-color: #b71c1c; /* darker red */
-    }
+  body { font-family: Arial, sans-serif; background: #f4f4f9; margin:0; padding:20px; display:flex; justify-content:center; }
+  .container { max-width: 450px; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  h2 { color: #333; text-align:center; }
+  input[type=text], input[type=email], input[type=password], input[type=number] {
+    width: 100%; padding: 10px; margin: 10px 0; border:1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+  }
+  button {
+    background-color: #4caf50; color: white; border:none; padding: 12px; width: 100%; font-size: 16px; cursor:pointer; border-radius: 5px;
+  }
+  button:disabled { background: #a5d6a7; cursor: not-allowed; }
+  .hidden { display: none; }
+  .message { margin: 10px 0; padding: 10px; border-radius: 4px; }
+  .error { background: #f8d7da; color: #721c24; }
+  .success { background: #d4edda; color: #155724; }
+  .link-btn {
+    background:none; border:none; color:#007bff; text-decoration: underline; cursor:pointer; margin-top: 10px; padding:0;
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-    <h1>Attendance Registration</h1>
+  <!-- REGISTRATION -->
+  <div id="registration-section">
+    <h2>Register</h2>
+    <input type="text" id="reg-student-id" placeholder="Student ID" required />
+    <input type="text" id="reg-student-name" placeholder="Full Name" required />
+    <input type="email" id="reg-student-email" placeholder="Email" required />
+    <input type="password" id="reg-password" placeholder="Password" required />
+    <input type="password" id="reg-password-confirm" placeholder="Confirm Password" required />
+    
+    <label><input type="checkbox" id="show-password"> Show Password</label>
 
-    <div id="registration-form">
-        <p>Please register once to continue:</p>
-        <input type="text" id="student-id" placeholder="Student ID" required /><br />
-        <input type="text" id="student-name" placeholder="Full Name" required /><br />
-        <input type="email" id="student-email" placeholder="Email Address" required /><br />
-        <button class="btn" onclick="registerStudent()">Register</button>
-    </div>
+    <button id="btn-send-otp" disabled>Send OTP</button>
+    
+    <p id="reg-message" class="message hidden"></p>
+  </div>
 
-    <p id="message" class="hidden"></p>
+  <!-- OTP VERIFICATION -->
+  <div id="otp-section" class="hidden">
+    <h2>Verify OTP</h2>
+    <p>OTP sent to your email. Please enter it below:</p>
+    <input type="number" id="otp-input" placeholder="Enter OTP" />
+    <button id="btn-verify-otp">Verify OTP</button>
+    <p id="otp-message" class="message hidden"></p>
+    <button class="link-btn" id="btn-resend-otp">Resend OTP</button>
+  </div>
 
-    <!-- Changed button text to 'Review Attendance' and onclick -->
-    <button id="submit-btn" class="btn hidden" onclick="showAttendanceReview()">Mark Attendance</button>
+  <!-- LOGIN -->
+  <div id="login-section" class="hidden">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Password" required />
+    <button id="btn-login">Login</button>
+    <p id="login-message" class="message hidden"></p>
+    <button class="link-btn" id="btn-to-register">Register Instead</button>
+  </div>
 
-    <!-- Clear Registration button (added as per your request) -->
-    <button id="clear-btn" class="btn hidden" onclick="clearRegistration()">Clear Registration</button>
+  <!-- ATTENDANCE -->
+  <div id="attendance-section" class="hidden">
+    <h2>Welcome, <span id="attendee-name"></span></h2>
+    <p><strong>Student ID:</strong> <span id="attendee-id"></span></p>
+    <p><strong>Email:</strong> <span id="attendee-email"></span></p>
+    <p><strong>Current Date & Time:</strong> <span id="current-datetime"></span></p>
+    <button id="btn-mark-attendance">Mark Attendance</button>
+    <p id="attendance-message" class="message hidden"></p>
+    <button class="link-btn" id="btn-logout">Logout</button>
+  </div>
 
-    <!-- New attendance review container -->
-    <div id="attendance-review">
-        <h2>Trainee Details</h2>
-        <p><strong>Trainee Name:</strong> <span id="review-name"></span></p>
-        <p><strong>Trainee ID:</strong> <span id="review-id"></span></p>
-        <p><strong>Check In:</strong> <span id="review-datetime"></span></p>
-        <button class="btn" onclick="submitAttendance()">Submit Attendance</button>
-    </div>
-
-    <div id="loading-animation">
-        <div class="pin">📍</div>
-        <p>Accessing your location… please wait</p>
-    </div>
 </div>
 
 <script>
-const officeLat = 24.435924784077514;
-const officeLon = 54.63383700803229;
-const maxDistanceMeters = 1000;
+// ==== Flow URLs ==== (Replace with your actual URLs)
+const validateStudentExistenceUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/d2fd8d79a22c4ea5ada0c512eaac3257/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QN_nV-ZLNHyUGxSBgC5sM2VSp5o1_Uqohoevm5bKRXk";
+const sendOtpUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/c3340d8bb42a415cb1932224e0625722/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KuDuKpT56nk7IaIXYg9ywDCitNF4E96swrAeXJ00h4Q";
+const verifyOtpUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/ad9257dcff9b4f709459576e558ad7a6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jrQnda9Jr_Opg_c-QaLoSSC1ZInoi5d1uvO7J7B-4wQ";
+const createRegistrationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/da543851a92f4e6d81aab7056650b8dd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0s7uFvz6dPm1zfJIWTnpq4RzzuaJXNgx6AgHFZxegrg";
+const checkLoginCredentialsUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/61a88948acdb477ebc866ac5ea518906/triggers/manual/paths/invoke?api-version=1";
+const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
-// Registration Flow URL
-const registrationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4c134c74b3cf4e10bb06058aece18852/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V_0WhaILSfvNqYIVGEsGVvREB13K5H3zviFW1JeCvEw";
-
-// Attendance Flow URL
-const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
-
-// New URLs for Clear Registration permission and reset
-const checkClearPermissionFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e7fac80971a5465e96b2fecadbccfdd0/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=cX7dp_9jfIVDb5A2cHzdIk4tPFXd1iu8O1YD0kWYIJc";
-const resetClearPermissionFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a52f33b10b774b27a898ac26a50d36dc/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U13p6N5hnv4kVDlfQPagXY4KmYk3KGqPmNBfs-MKlK4";
-
-// NEW URL for Delete Registration from SharePoint
-const deleteRegistrationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/5791e0771af14cbea1ef5d523fe60c98/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3uu1u056-McIeaN9b5ns_zvGtGg-0gkJI4DqDg1Tyrc";
-
-// --- ADDED: Validation Flow URL ---
-const validationFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d2fd8d79a22c4ea5ada0c512eaac3257/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QN_nV-ZLNHyUGxSBgC5sM2VSp5o1_Uqohoevm5bKRXk";
-
-function getUAETime() {
-    const nowUTC = new Date();
-    return new Date(nowUTC.getTime() + 4 * 60 * 60000);
+// === Utility functions ===
+function showSection(sectionId) {
+  ['registration-section', 'otp-section', 'login-section', 'attendance-section'].forEach(id => {
+    document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+  });
+  clearMessages();
 }
 
-function checkAndResetAttendance() {
-    const storedDate = localStorage.getItem("lastSubmission");
-    if (!storedDate) return;
+function clearMessages() {
+  ['reg-message', 'otp-message', 'login-message', 'attendance-message'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'message hidden';
+    el.textContent = '';
+  });
+}
 
-    const now = getUAETime();
-    const today = now.toISOString().split("T")[0];
-    const resetTime = new Date(`${today}T06:00:00+04:00`);
+function showMessage(id, text, isError = true) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = isError ? 'message error' : 'message success';
+  el.classList.remove('hidden');
+}
 
-    if (now >= resetTime && storedDate !== today) {
-        localStorage.removeItem("lastSubmission");
+function getCurrentUAETimeISO() {
+  const now = new Date();
+  // UAE is UTC+4
+  const uaeTime = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  return uaeTime.toISOString().slice(0,19); // YYYY-MM-DDTHH:mm:ss
+}
+
+// === Password show/hide toggle ===
+document.getElementById('show-password').addEventListener('change', e => {
+  const pass = document.getElementById('reg-password');
+  const conf = document.getElementById('reg-password-confirm');
+  if(e.target.checked) {
+    pass.type = 'text';
+    conf.type = 'text';
+  } else {
+    pass.type = 'password';
+    conf.type = 'password';
+  }
+});
+
+// Enable Send OTP button only if inputs are filled and passwords match
+function validateRegistrationInputs() {
+  const id = document.getElementById('reg-student-id').value.trim();
+  const name = document.getElementById('reg-student-name').value.trim();
+  const email = document.getElementById('reg-student-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const conf = document.getElementById('reg-password-confirm').value;
+
+  const btn = document.getElementById('btn-send-otp');
+  if(id && name && email && pass && conf && pass === conf) {
+    btn.disabled = false;
+    clearMessages();
+  } else {
+    btn.disabled = true;
+    if(pass !== conf && pass && conf) {
+      showMessage('reg-message', 'Passwords do not match.');
+    } else {
+      document.getElementById('reg-message').classList.add('hidden');
     }
-}
-checkAndResetAttendance();
-
-const storedData = JSON.parse(localStorage.getItem("studentData"));
-if (storedData) {
-    document.getElementById("registration-form").classList.add("hidden");
-    startLocationVerification(storedData);
-    checkClearPermission(storedData.id);   // <-- added this call here as per your request
+  }
 }
 
-// --- UPDATED registerStudent function ---
-async function registerStudent() {
-    const id = document.getElementById("student-id").value.trim();
-    const name = document.getElementById("student-name").value.trim();
-    const email = document.getElementById("student-email").value.trim();
-    if (!id || !name || !email) {
-        alert("Please fill in all fields");
-        return;
-    }
+['reg-student-id','reg-student-name','reg-student-email','reg-password','reg-password-confirm'].forEach(id => {
+  document.getElementById(id).addEventListener('input', validateRegistrationInputs);
+});
 
-    try {
-        const response = await fetch(validationFlowUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ StudentID: id, FullName: name, Email: email })
-        });
+// === Registration: Send OTP ===
+document.getElementById('btn-send-otp').addEventListener('click', async () => {
+  clearMessages();
+  const id = document.getElementById('reg-student-id').value.trim();
+  const name = document.getElementById('reg-student-name').value.trim();
+  const email = document.getElementById('reg-student-email').value.trim();
+  const password = document.getElementById('reg-password').value;
 
-        if (!response.ok) {
-            alert("Validation service unavailable. Please try again.");
-            return;
-        }
+  showMessage('reg-message', 'Validating user...', false);
 
-        const result = await response.json();
-
-        if (!result.valid) {
-            alert(result.message || "Your input details don't exist/matches our database.");
-            return;
-        }
-
-        // Validation passed: save and continue registration flow
-        const studentData = { id, name, email };
-        localStorage.setItem("studentData", JSON.stringify(studentData));
-        document.getElementById("registration-form").classList.add("hidden");
-
-        sendRegistrationToFlow(studentData);
-        startLocationVerification(studentData);
-
-    } catch (error) {
-        alert("Error during validation: " + error.message);
-    }
-}
-
-function sendRegistrationToFlow(studentData) {
-    fetch(registrationFlowUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            StudentID: studentData.id,
-            FullName: studentData.name,
-            Email: studentData.email
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            console.error("Failed to send registration data to flow.");
-        }
-    })
-    .catch(error => {
-        console.error("Error sending registration data to flow:", error);
+  try {
+    // Validate student existence in OJE TRAINEE MASTER DATA
+    const validateResponse = await fetch(validateStudentExistenceUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({StudentID: id, FullName: name, Email: email})
     });
-}
+    if(!validateResponse.ok) throw new Error('Validation service error');
+    const validateResult = await validateResponse.json();
 
-function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371000;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function startLocationVerification(studentData) {
-    const messageEl = document.getElementById("message");
-    const submitBtn = document.getElementById("submit-btn");
-    const loadingAnim = document.getElementById("loading-animation");
-
-    messageEl.classList.remove("hidden");
-    messageEl.classList.remove("success-box");
-
-    const today = getUAETime().toISOString().split("T")[0];
-    if (localStorage.getItem("lastSubmission") === today) {
-        messageEl.innerText = "✅ Your attendance has already been marked for today 😊";
-        messageEl.classList.add("success-box");
-        return;
+    if(!validateResult.valid) {
+      showMessage('reg-message', validateResult.message || 'Student not found in master data.');
+      return;
     }
 
-    loadingAnim.style.display = "block";
-    messageEl.innerText = " ";
+    // Save entered data temporarily in sessionStorage for OTP step
+    sessionStorage.setItem('regTempData', JSON.stringify({id, name, email, password}));
 
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            loadingAnim.style.display = "none";
-            const distance = getDistance(
-                pos.coords.latitude,
-                pos.coords.longitude,
-                officeLat,
-                officeLon
-            );
-
-            if (distance <= maxDistanceMeters) {
-                messageEl.innerText = "You are within the Attendance area!";
-                document.getElementById("submit-btn").classList.remove("hidden");
-            } else {
-                messageEl.innerText = "You are not within the allowed area⚠️";
-                document.getElementById("submit-btn").classList.add("hidden");
-            }
-        },
-        () => {
-            loadingAnim.style.display = "none";
-            messageEl.innerText = "Unable to access your location. Please refresh!";
-            document.getElementById("submit-btn").classList.add("hidden");
-        },
-        { timeout: 5000 }
-    );
-}
-
-function showAttendanceReview() {
-    const studentData = JSON.parse(localStorage.getItem("studentData"));
-    if (!studentData) {
-        alert("Please register first.");
-        return;
-    }
-    const now = getUAETime();
-
-    // Subtract 4 hours from now for display only
-    const displayTime = new Date(now.getTime() - 4 * 60 * 60 * 1000);
-
-    // Hide main submit button and message
-    document.getElementById("submit-btn").classList.add("hidden");
-    document.getElementById("message").classList.add("hidden");
-
-    // Show attendance review container
-    const reviewDiv = document.getElementById("attendance-review");
-    reviewDiv.style.display = "block";
-
-    // Fill in details
-    document.getElementById("review-name").innerText = studentData.name;
-    document.getElementById("review-id").innerText = studentData.id;
-    document.getElementById("review-datetime").innerText = displayTime.toLocaleString();
-}
-
-function getUAEISOString() {
-    const nowUTC = new Date();
-    const uaeTime = new Date(nowUTC.getTime() + 4 * 60 * 60 * 1000);
-
-    const year = uaeTime.getUTCFullYear();
-    const month = String(uaeTime.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(uaeTime.getUTCDate()).padStart(2, '0');
-    const hours = String(uaeTime.getUTCHours()).padStart(2, '0');
-    const minutes = String(uaeTime.getUTCMinutes()).padStart(2, '0');
-    const seconds = String(uaeTime.getUTCSeconds()).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+04:00`;
-}
-
-function submitAttendance() {
-    const studentData = JSON.parse(localStorage.getItem("studentData"));
-    const now = getUAETime();
-    const today = now.toISOString().split("T")[0];
-    if (localStorage.getItem("lastSubmission") === today) {
-        alert("You have already marked attendance for today.");
-        return;
-    }
-    if (!studentData) {
-        alert("Please register first.");
-        return;
-    }
-
-    const attendanceData = {
-        Student: studentData.name,
-        StudentID: studentData.id,
-        DateTime: now.toISOString().slice(0,19),  // <<<<< Changed this line ONLY
-        Email: studentData.email
-    };
-
-    fetch(attendanceFlowUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(attendanceData)
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Failed to submit attendance");
-        return; // Skip parsing JSON because flow returns empty response
-    })
-    .then(() => {
-        localStorage.setItem("lastSubmission", today);
-        // Hide attendance review after success
-        document.getElementById("attendance-review").style.display = "none";
-        document.getElementById("message").innerText = "✅ Attendance submitted successfully! 😊";
-        document.getElementById("message").classList.remove("hidden");
-    })
-    .catch(err => {
-        alert("Error submitting attendance: " + err.message);
+    // Call SendOTP flow with Email
+    const sendOtpResponse = await fetch(sendOtpUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email: email})
     });
+    if(!sendOtpResponse.ok) throw new Error('Failed to send OTP');
+
+    showMessage('otp-message', 'OTP sent! Please check your email.', false);
+
+    // Move to OTP section
+    showSection('otp-section');
+
+  } catch (err) {
+    showMessage('reg-message', 'Error: ' + err.message);
+  }
+});
+
+// === OTP Verification ===
+document.getElementById('btn-verify-otp').addEventListener('click', async () => {
+  clearMessages();
+  const otp = document.getElementById('otp-input').value.trim();
+  if(!otp) {
+    showMessage('otp-message', 'Please enter the OTP.');
+    return;
+  }
+
+  const tempDataStr = sessionStorage.getItem('regTempData');
+  if(!tempDataStr) {
+    showMessage('otp-message', 'Session expired. Please register again.');
+    showSection('registration-section');
+    return;
+  }
+  const tempData = JSON.parse(tempDataStr);
+
+  try {
+    const verifyResponse = await fetch(verifyOtpUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email: tempData.email, OTP: otp})
+    });
+    if(!verifyResponse.ok) throw new Error('OTP verification failed');
+
+    const verifyResult = await verifyResponse.json();
+
+    if(!verifyResult.valid) {
+      showMessage('otp-message', verifyResult.message || 'OTP did not match or expired.');
+      return;
+    }
+
+    // OTP verified - create registration in SharePoint
+    showMessage('otp-message', 'OTP verified! Creating registration...', false);
+
+    const createResponse = await fetch(createRegistrationUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        StudentID: tempData.id,
+        FullName: tempData.name,
+        Email: tempData.email,
+        Password: tempData.password,
+        Registered: true
+      })
+    });
+    if(!createResponse.ok) throw new Error('Failed to create registration');
+
+    showMessage('otp-message', 'Registration successful! Please login.', false);
+    sessionStorage.removeItem('regTempData');
+
+    // Show login section after short delay
+    setTimeout(() => {
+      showSection('login-section');
+      clearRegistrationForm();
+    }, 1500);
+
+  } catch (err) {
+    showMessage('otp-message', 'Error: ' + err.message);
+  }
+});
+
+// Resend OTP button
+document.getElementById('btn-resend-otp').addEventListener('click', async () => {
+  clearMessages();
+  const tempDataStr = sessionStorage.getItem('regTempData');
+  if(!tempDataStr) {
+    showMessage('otp-message', 'Session expired. Please register again.');
+    showSection('registration-section');
+    return;
+  }
+  const tempData = JSON.parse(tempDataStr);
+  try {
+    const sendOtpResponse = await fetch(sendOtpUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email: tempData.email})
+    });
+    if(!sendOtpResponse.ok) throw new Error('Failed to send OTP');
+    showMessage('otp-message', 'OTP resent! Please check your email.', false);
+  } catch(err) {
+    showMessage('otp-message', 'Error: ' + err.message);
+  }
+});
+
+// === Clear registration form inputs ===
+function clearRegistrationForm() {
+  ['reg-student-id','reg-student-name','reg-student-email','reg-password','reg-password-confirm'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('btn-send-otp').disabled = true;
+  document.getElementById('reg-message').classList.add('hidden');
 }
 
-// ----------------- Added Functions for Clear Registration -----------------
+// === Login ===
+document.getElementById('btn-login').addEventListener('click', async () => {
+  clearMessages();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
 
-function checkClearPermission(studentId) {
-    fetch(checkClearPermissionFlowUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ StudentID: studentId })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.allowClear === true) {
-            document.getElementById("clear-btn").classList.remove("hidden");
-        }
-    })
-    .catch(err => console.error("Error checking clear permission:", err));
-}
+  if(!email || !password) {
+    showMessage('login-message', 'Please enter email and password.');
+    return;
+  }
 
-function clearRegistration() {
-    if (!confirm("Are you sure you want to clear your registration?")) return;
-
-    const studentData = JSON.parse(localStorage.getItem("studentData"));
-
-    localStorage.removeItem("studentData");
-    localStorage.removeItem("lastSubmission");
-
-    // Call the ResetClearRegistrationPermission flow
-    fetch(resetClearPermissionFlowUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ StudentID: studentData.id })
+  try {
+    const loginResponse = await fetch(checkLoginCredentialsUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({Email: email, Password: password})
     });
 
-    // Call the DeleteRegistration flow to remove SharePoint data
-    fetch(deleteRegistrationFlowUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ StudentID: studentData.id })
-    })
-    .then(response => {
-        if (!response.ok) {
-            console.error("Failed to delete registration from SharePoint");
-        }
-    })
-    .catch(error => {
-        console.error("Error deleting registration:", error);
-    });
+    if(!loginResponse.ok) throw new Error('Login failed');
+    const loginResult = await loginResponse.json();
 
-    alert("Registration cleared. Please refresh and register again.");
-    location.reload();
+    if(!loginResult.valid) {
+      showMessage('login-message', loginResult.message || 'Invalid credentials or not registered.');
+      return;
+    }
+
+    // Save login email in sessionStorage
+    sessionStorage.setItem('loggedInEmail', email);
+    sessionStorage.setItem('loggedInName', loginResult.name || '');
+    sessionStorage.setItem('loggedInStudentID', loginResult.studentID || '');
+
+    showSection('attendance-section');
+    loadAttendanceDetails();
+
+  } catch (err) {
+    showMessage('login-message', 'Error: ' + err.message);
+  }
+});
+
+// Show login form when user clicks Register Instead
+document.getElementById('btn-to-register').addEventListener('click', () => {
+  showSection('registration-section');
+});
+
+// === Load Attendance Details ===
+function loadAttendanceDetails() {
+  const email = sessionStorage.getItem('loggedInEmail');
+  const name = sessionStorage.getItem('loggedInName');
+  const studentID = sessionStorage.getItem('loggedInStudentID');
+
+  if(!email) {
+    showSection('login-section');
+    return;
+  }
+
+  document.getElementById('attendee-name').textContent = name || '';
+  document.getElementById('attendee-id').textContent = studentID || '';
+  document.getElementById('attendee-email').textContent = email;
+  updateCurrentDateTime();
 }
 
+function updateCurrentDateTime() {
+  const now = new Date();
+  const uaeTime = new Date(now.getTime() + 4*60*60*1000);
+  document.getElementById('current-datetime').textContent = uaeTime.toLocaleString();
+}
+
+setInterval(updateCurrentDateTime, 1000);
+
+// === Mark Attendance ===
+document.getElementById('btn-mark-attendance').addEventListener('click', async () => {
+  clearMessages();
+  const email = sessionStorage.getItem('loggedInEmail');
+  const studentID = sessionStorage.getItem('loggedInStudentID');
+  const name = sessionStorage.getItem('loggedInName');
+
+  if(!email) {
+    showMessage('attendance-message', 'You are not logged in.');
+    showSection('login-section');
+    return;
+  }
+
+  try {
+    // Call attendance flow (pass email + timestamp)
+    const attendanceResponse = await fetch(attendanceFlowUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        Email: email,
+        StudentID: studentID,
+        FullName: name,
+        AttendanceTime: new Date().toISOString()
+      })
+    });
+
+    if(!attendanceResponse.ok) throw new Error('Failed to mark attendance');
+    const attendanceResult = await attendanceResponse.json();
+
+    if(attendanceResult.success) {
+      showMessage('attendance-message', 'Attendance marked successfully!', false);
+    } else {
+      showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
+    }
+  } catch(err) {
+    showMessage('attendance-message', 'Error: ' + err.message);
+  }
+});
+
+// === Logout ===
+document.getElementById('btn-logout').addEventListener('click', () => {
+  sessionStorage.clear();
+  showSection('login-section');
+});
+
+// === On page load ===
+window.onload = () => {
+  if(sessionStorage.getItem('loggedInEmail')) {
+    showSection('attendance-section');
+    loadAttendanceDetails();
+  } else {
+    showSection('registration-section');
+  }
+};
 </script>
 
 </body>
