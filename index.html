@@ -22,6 +22,13 @@
   .link-btn {
     background:none; border:none; color:#007bff; text-decoration: underline; cursor:pointer; margin-top: 10px; padding:0;
   }
+
+  /* === NEW (layout only): Attendance page look like screenshot === */
+  .page-title { font-size: 44px; font-weight: 800; text-align:center; margin: 0 0 8px 0; color:#333; }
+  .page-subtitle { text-align:center; color:#666; margin: 0 0 18px 0; font-size: 18px; }
+  .info-card { border:1px solid #e6e6e6; border-radius:10px; padding:16px; background:#fafafa; margin: 14px 0 18px 0; }
+  .info-row { font-size: 20px; line-height: 1.7; color:#222; }
+  .info-row strong { font-weight: 800; }
 </style>
 </head>
 <body>
@@ -30,7 +37,9 @@
 
   <!-- REGISTRATION -->
   <div id="registration-section">
-    <h2>Register</h2>
+    <h2 class="page-title">Automated Attendance System</h2>
+    <p class="page-subtitle">Registration</p>
+
     <input type="text" id="reg-student-id" placeholder="Student ID" required />
     <input type="text" id="reg-student-name" placeholder="Full Name" required />
     <input type="email" id="reg-student-email" placeholder="Email" required />
@@ -59,7 +68,9 @@
 
   <!-- LOGIN -->
   <div id="login-section" class="hidden">
-    <h2>Login</h2>
+    <h2 class="page-title">Automated Attendance System</h2>
+    <p class="page-subtitle">Login</p>
+
     <input type="email" id="login-email" placeholder="Email" required />
     <input type="password" id="login-password" placeholder="Password" required />
     <button id="btn-login">Login</button>
@@ -69,10 +80,15 @@
 
   <!-- ATTENDANCE -->
   <div id="attendance-section" class="hidden">
-    <h2><span id="attendee-name"></span></h2>
-    <p><strong>Student ID:</strong> <span id="attendee-id"></span></p>
-    <p><strong>Email:</strong> <span id="attendee-email"></span></p>
-    <p><strong>Current Date & Time:</strong> <span id="current-datetime"></span></p>
+    <h2 class="page-title">Attendance</h2>
+    <p class="page-subtitle">Current Date & Time: <span id="current-datetime"></span></p>
+
+    <div class="info-card">
+      <div class="info-row"><strong>Student ID:</strong> <span id="attendee-id"></span></div>
+      <div class="info-row"><strong>Full Name:</strong> <span id="attendee-name"></span></div>
+      <div class="info-row"><strong>Email:</strong> <span id="attendee-email"></span></div>
+    </div>
+
     <button id="btn-mark-attendance">Mark Attendance</button>
     <p id="attendance-message" class="message hidden"></p>
     <button class="link-btn" id="btn-logout">Logout</button>
