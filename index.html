@@ -151,7 +151,7 @@ async function checkAttendanceTodayAndLock() {
     const result = await res.json();
 
     if(result && result.marked) {
-      showAttendanceResult('Your attendance has already been marked for today');
+      showAttendanceResult('✅Your attendance has already been marked for today😊');
       return;
     }
   } catch(e) {
@@ -474,7 +474,7 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
       showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
     } else {
       // === Redirect to result page after success ===
-      showAttendanceResult('Attendance submitted successfully');
+      showAttendanceResult('✅Attendance submitted successfully');
     }
     // ===== END FIX =====
 
