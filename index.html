@@ -400,13 +400,21 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     });
 
     if(!attendanceResponse.ok) throw new Error('Failed to mark attendance');
-    const attendanceResult = await attendanceResponse.json();
 
-    if(attendanceResult.success) {
-      showMessage('attendance-message', 'Attendance marked successfully!', false);
-    } else {
-      showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
+    // ===== FIX: handle empty response body safely (do not change anything else) =====
+    let attendanceResult = null;
+    const raw = await attendanceResponse.text();
+    if (raw) {
+      try { attendanceResult = JSON.parse(raw); } catch(e) { attendanceResult = null; }
     }
+
+    if(attendanceResult && attendanceResult.success === false) {
+      showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
+    } else {
+      showMessage('attendance-message', 'Attendance marked successfully!', false);
+    }
+    // ===== END FIX =====
+
   } catch(err) {
     showMessage('attendance-message', 'Error: ' + err.message);
   }
