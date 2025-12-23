@@ -78,11 +78,9 @@
     <button class="link-btn" id="btn-logout">Logout</button>
   </div>
 
-  <!-- NEW: ATTENDANCE SUCCESS PAGE -->
-  <div id="attendance-success-section" class="hidden">
-    <h2>Attendance</h2>
-    <p id="attendance-success-message" class="message success">Your attendance has been marked successfully.</p>
-    <button class="link-btn" id="btn-success-logout">Logout</button>
+  <!-- NEW: RESULT PAGE (ONLY MESSAGE CONTAINER) -->
+  <div id="attendance-result-section" class="hidden">
+    <p id="attendance-result-message" class="message success"></p>
   </div>
 
 </div>
@@ -96,12 +94,12 @@ const createRegistrationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.
 const checkLoginCredentialsUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/61a88948acdb477ebc866ac5ea518906/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-TNlSxMBeur6V4y7JinLwp8Is3gb2L4tQpxGEDKXCCk";
 const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
-// === Check Attendance (Today) Flow URL ===
+// === NEW: Check Attendance (Today) Flow URL ===
 const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSY-f9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
 
 // === Utility functions ===
 function showSection(sectionId) {
-  ['registration-section', 'otp-section', 'login-section', 'attendance-section', 'attendance-success-section'].forEach(id => {
+  ['registration-section', 'otp-section', 'login-section', 'attendance-section', 'attendance-result-section'].forEach(id => {
     document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
   });
   clearMessages();
@@ -129,8 +127,15 @@ function getCurrentUAETimeISO() {
   return uaeTime.toISOString().slice(0,19); // YYYY-MM-DDTHH:mm:ss
 }
 
-// === UPDATED: Check attendance today (no disabled button, just message) ===
-async function checkAttendanceTodayAndNotify() {
+// === NEW: Show Result Page (ONLY MESSAGE CONTAINER) ===
+function showAttendanceResult(messageText) {
+  const msg = document.getElementById('attendance-result-message');
+  msg.textContent = messageText;
+  showSection('attendance-result-section');
+}
+
+// === UPDATED: Check if attendance already marked today (redirect to result page, no disable, no details) ===
+async function checkAttendanceTodayAndLock() {
   const studentID = sessionStorage.getItem('loggedInStudentID');
   if(!studentID) return;
 
@@ -146,12 +151,11 @@ async function checkAttendanceTodayAndNotify() {
     const result = await res.json();
 
     if(result && result.marked) {
-      showMessage('attendance-message', 'Your attendance has been marked for today!', false);
-    } else {
-      document.getElementById('attendance-message').classList.add('hidden');
+      showAttendanceResult('Your attendance has already been marked for today');
+      return;
     }
   } catch(e) {
-    // If check fails, do nothing (do not block user)
+    // If check fails, do not block the student
   }
 }
 
@@ -400,8 +404,8 @@ function loadAttendanceDetails() {
   document.getElementById('attendee-email').textContent = email;
   updateCurrentDateTime();
 
-  // === NEW: just notify if already marked today ===
-  checkAttendanceTodayAndNotify();
+  // === Redirect to result page if already marked today ===
+  checkAttendanceTodayAndLock();
 }
 
 function updateCurrentDateTime() {
@@ -425,7 +429,7 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     return;
   }
 
-  // === NEW: if already marked today, just show message (no disable) ===
+  // === If already marked today, redirect to result page ===
   try {
     const chk = await fetch(checkAttendanceTodayUrl, {
       method: 'POST',
@@ -436,7 +440,7 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     if(chk.ok) {
       const chkResult = await chk.json();
       if(chkResult && chkResult.marked) {
-        showMessage('attendance-message', 'Your attendance has been marked for today!', false);
+        showAttendanceResult('Your attendance has already been marked for today');
         return;
       }
     }
@@ -469,8 +473,8 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     if(attendanceResult && attendanceResult.success === false) {
       showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
     } else {
-      // === NEW: go to success page ===
-      showSection('attendance-success-section');
+      // === Redirect to result page after success ===
+      showAttendanceResult('Attendance submitted successfully');
     }
     // ===== END FIX =====
 
@@ -481,12 +485,6 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
 
 // === Logout ===
 document.getElementById('btn-logout').addEventListener('click', () => {
-  sessionStorage.clear();
-  showSection('login-section');
-});
-
-// === NEW: Logout from success page ===
-document.getElementById('btn-success-logout').addEventListener('click', () => {
   sessionStorage.clear();
   showSection('login-section');
 });
