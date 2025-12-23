@@ -84,6 +84,9 @@
   <div id="attendance-section" class="hidden">
     <h2 class="page-title">Attendance</h2>
 
+    <!-- KEEP TIME UPDATED FOR JS, BUT DO NOT DISPLAY IT HERE -->
+    <span id="current-datetime" class="hidden"></span>
+
     <div class="info-card">
       <!-- CHANGED LABELS + FIELD REPLACEMENT -->
       <div class="info-row"><strong>ID:</strong> <span id="attendee-id"></span></div>
@@ -420,7 +423,6 @@ function loadAttendanceDetails() {
 
   document.getElementById('attendee-name').textContent = name || '';
   document.getElementById('attendee-id').textContent = studentID || '';
-  /* CHANGED: show date & time in the same place where email was shown (same span id, functions unchanged) */
   document.getElementById('attendee-email').textContent = document.getElementById('current-datetime').textContent;
 
   updateCurrentDateTime();
@@ -434,7 +436,6 @@ function updateCurrentDateTime() {
   const uaeTime = new Date(now.getTime() + 4*60*60*1000);
   document.getElementById('current-datetime').textContent = uaeTime.toLocaleString();
 
-  /* NEW (safe): keep the Date & Time row updated too, without changing any logic */
   if (document.getElementById('attendance-section').style.display !== 'none') {
     const dtEl = document.getElementById('attendee-email');
     if (dtEl) dtEl.textContent = document.getElementById('current-datetime').textContent;
