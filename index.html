@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>  
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -553,7 +553,8 @@ function loadAttendanceDetails() {
 
 function updateCurrentDateTime() {
   const now = new Date();
-  const uaeTime = new Date(now.getTime() + 4*60*60*1000);
+  /* CHANGED ONLY HERE: removed +4 hours addition */
+  const uaeTime = new Date(now.getTime());
   document.getElementById('current-datetime').textContent = uaeTime.toLocaleString();
 
   if (document.getElementById('attendance-section').style.display !== 'none') {
