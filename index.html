@@ -31,11 +31,60 @@
   /* CHANGED: reduce by 2 points (20 -> 18) */
   .info-row { font-size: 18px; line-height: 1.7; color:#222; }
   .info-row strong { font-weight: 800; }
+
+  /* === NEW: Location gate page (layout only) === */
+  .location-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 10px 0 0 0; }
+  .pin {
+    width: 34px; height: 34px; border-radius: 50% 50% 50% 0;
+    background: #e74c3c;
+    transform: rotate(-45deg);
+    position: relative;
+    margin: 18px 0 16px 0;
+    animation: pinBounce 1.1s infinite;
+  }
+  .pin:after{
+    content:'';
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    position:absolute;
+    top: 10px; left: 10px;
+  }
+  .pin-shadow{
+    width: 26px; height: 8px;
+    background: rgba(0,0,0,0.12);
+    border-radius: 50%;
+    margin-top: -4px;
+    animation: shadowPulse 1.1s infinite;
+  }
+  @keyframes pinBounce{
+    0%,100% { transform: rotate(-45deg) translateY(0); }
+    50% { transform: rotate(-45deg) translateY(-10px); }
+  }
+  @keyframes shadowPulse{
+    0%,100% { transform: scale(1); opacity: .35; }
+    50% { transform: scale(.75); opacity: .15; }
+  }
+  .location-text{
+    text-align:center;
+    font-size: 18px;
+    color:#333;
+    margin: 14px 0 0 0;
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
+
+  <!-- NEW: LOCATION GATE -->
+  <div id="location-section" class="hidden">
+    <div class="location-wrap">
+      <div class="pin"></div>
+      <div class="pin-shadow"></div>
+      <p id="location-text" class="location-text">Accessing your location, please wait!</p>
+    </div>
+  </div>
 
   <!-- REGISTRATION -->
   <div id="registration-section">
@@ -88,7 +137,6 @@
     <span id="current-datetime" class="hidden"></span>
 
     <div class="info-card">
-      <!-- CHANGED LABELS + FIELD REPLACEMENT -->
       <div class="info-row"><strong>ID:</strong> <span id="attendee-id"></span></div>
       <div class="info-row"><strong>Name:</strong> <span id="attendee-name"></span></div>
       <div class="info-row"><strong>Date & Time:</strong> <span id="attendee-email"></span></div>
@@ -119,9 +167,19 @@ const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.envi
 // === NEW: Check Attendance (Today) Flow URL ===
 const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSY-f9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
 
+// === NEW: Location Gate Settings ===
+const AUTH_LAT = 24.43631074997773;
+const AUTH_LNG = 54.633581449737385;
+const AUTH_RADIUS_METERS = 500;
+
 // === Utility functions ===
 function showSection(sectionId) {
-  ['registration-section', 'otp-section', 'login-section', 'attendance-section', 'attendance-result-section'].forEach(id => {
+  // NEW: block access to all pages until location verified
+  if(sectionId !== 'location-section' && sessionStorage.getItem('locationVerified') !== 'true') {
+    sectionId = 'location-section';
+  }
+
+  ['location-section','registration-section', 'otp-section', 'login-section', 'attendance-section', 'attendance-result-section'].forEach(id => {
     document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
   });
   clearMessages();
@@ -147,6 +205,68 @@ function getCurrentUAETimeISO() {
   // UAE is UTC+4
   const uaeTime = new Date(now.getTime() + 4 * 60 * 60 * 1000);
   return uaeTime.toISOString().slice(0,19); // YYYY-MM-DDTHH:mm:ss
+}
+
+// === NEW: Location Distance (Haversine) ===
+function toRad(x){ return x * Math.PI / 180; }
+function distanceMeters(lat1, lon1, lat2, lon2){
+  const R = 6371000;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// === NEW: Location Gate ===
+function setLocationText(t){
+  const el = document.getElementById('location-text');
+  if(el) el.textContent = t;
+}
+
+function proceedAfterLocationCheck(){
+  if(sessionStorage.getItem('loggedInEmail')) {
+    showSection('attendance-section');
+    loadAttendanceDetails();
+  } else {
+    showSection('registration-section');
+  }
+}
+
+function verifyLocationGate(){
+  showSection('location-section');
+  setLocationText('Accessing your location, please wait!');
+
+  if(!navigator.geolocation) {
+    setLocationText('Unable to access location, please refresh!');
+    sessionStorage.setItem('locationVerified', 'false');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      const d = distanceMeters(lat, lng, AUTH_LAT, AUTH_LNG);
+
+      if(d <= AUTH_RADIUS_METERS) {
+        sessionStorage.setItem('locationVerified', 'true');
+        proceedAfterLocationCheck();
+      } else {
+        sessionStorage.setItem('locationVerified', 'false');
+        setLocationText('Please move to the authorized attendance area');
+      }
+    },
+    () => {
+      sessionStorage.setItem('locationVerified', 'false');
+      setLocationText('Unable to access location, please refresh!');
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
 }
 
 // === NEW: Show Result Page (ONLY MESSAGE CONTAINER) ===
@@ -519,12 +639,8 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 
 // === On page load ===
 window.onload = () => {
-  if(sessionStorage.getItem('loggedInEmail')) {
-    showSection('attendance-section');
-    loadAttendanceDetails();
-  } else {
-    showSection('registration-section');
-  }
+  // ALWAYS verify location first
+  verifyLocationGate();
 };
 </script>
 
