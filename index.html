@@ -74,6 +74,9 @@
 
   /* === NEW: Dashboard buttons (blue) === */
   .blue-btn { background-color:#003366; color:#fff; margin-top:10px; }
+
+  /* === NEW: Back button (red) === */
+  .red-btn { background-color:#c0392b; color:#fff; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -87,6 +90,7 @@
       <div class="pin-shadow"></div>
       <p id="location-text" class="location-text">Accessing your location, please wait!</p>
     </div>
+    <button id="btn-back-from-location" class="red-btn">Back</button>
   </div>
 
   <!-- REGISTRATION -->
@@ -160,12 +164,15 @@
 
     <button id="btn-mark-attendance">Mark Attendance</button>
     <p id="attendance-message" class="message hidden"></p>
+
+    <button id="btn-back-from-attendance" class="red-btn">Back</button>
     <button class="link-btn" id="btn-logout">Logout</button>
   </div>
 
   <!-- NEW: RESULT PAGE (ONLY MESSAGE CONTAINER) -->
   <div id="attendance-result-section" class="hidden">
     <p id="attendance-result-message" class="message success"></p>
+    <button id="btn-back-from-result" class="red-btn">Back</button>
   </div>
 
 </div>
@@ -555,6 +562,19 @@ document.getElementById('btn-dashboard-taskcount').addEventListener('click', () 
 document.getElementById('btn-logout-dashboard').addEventListener('click', () => {
   sessionStorage.clear();
   showSection('login-section');
+});
+
+// === BACK BUTTONS (to dashboard) ===
+document.getElementById('btn-back-from-attendance').addEventListener('click', () => {
+  showSection('dashboard-section');
+});
+
+document.getElementById('btn-back-from-result').addEventListener('click', () => {
+  showSection('dashboard-section');
+});
+
+document.getElementById('btn-back-from-location').addEventListener('click', () => {
+  showSection('dashboard-section');
 });
 
 // === Load Attendance Details ===
