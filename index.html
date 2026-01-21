@@ -8,7 +8,7 @@
   body { font-family: Arial, sans-serif; background: #f4f4f9; margin:0; padding:20px; display:flex; justify-content:center; }
   .container { max-width: 450px; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
   h2 { color: #333; text-align:center; }
-  input[type=text], input[type=email], input[type=password], input[type=number] {
+  input[type=text], input[type=email], input[type=password], input[type=number], select {
     width: 100%; padding: 10px; margin: 10px 0; border:1px solid #ccc; border-radius: 4px; box-sizing: border-box;
   }
   button {
@@ -94,7 +94,7 @@
   </div>
 
   <!-- REGISTRATION -->
-  <div id="registration-section">
+  <div id="registration-section" class="hidden">
     <h2 class="page-title">OJE Trainee Automated System</h2>
     <p class="page-subtitle">Registration</p>
 
@@ -159,7 +159,6 @@
       <div class="info-row"><strong>ID:</strong> <span id="attendee-id"></span></div>
       <div class="info-row"><strong>Name:</strong> <span id="attendee-name"></span></div>
       <div class="info-row"><strong>Date & Time:</strong> <span id="attendee-email"></span></div>
-      <!-- NOTE: keeping the same span id="attendee-email" so JS functions remain unchanged -->
     </div>
 
     <button id="btn-mark-attendance">Mark Attendance</button>
@@ -197,6 +196,74 @@
     <p id="taskcount-success-message" class="message success">✅ Your logbook task count was updated successfully.</p>
   </div>
 
+  <!-- ✅ NEW: AIRCRAFT ALLOCATION SECTION -->
+  <div id="aircraft-section" class="hidden">
+    <h2 class="page-title">Aircraft Allocation</h2>
+    <p class="page-subtitle">Update your current aircraft details</p>
+
+    <select id="aircraft-location" required>
+      <option value="">Select Location</option>
+      <option>H1</option><option>H1-Outside</option>
+      <option>H2</option><option>H2-Outside</option>
+      <option>H3</option><option>H3-Outside</option>
+      <option>H3-A</option><option>H3-A-Outside</option>
+      <option>H4</option><option>H4-Outside</option>
+      <option>H5</option><option>H5-Outside</option>
+      <option>H6-A</option><option>H6-A-Outside</option>
+      <option>H6-B</option><option>H6-B-Outside</option>
+      <option>H6-C</option><option>H6-C-Outside</option>
+      <option>H6-D</option><option>H6-D-Outside</option>
+      <option>H7</option><option>H7-Outside</option>
+      <option>Bay 5</option>
+      <option>Bay 6</option>
+      <option>Bay 7</option>
+      <option>Bay 8</option>
+    </select>
+
+    <input type="text" id="aircraft-registration" placeholder="Aircraft Registration (e.g., A6-XXX)" />
+
+    <select id="aircraft-type" required>
+      <option value="">Select Aircraft Type</option>
+      <option>Airbus A318</option>
+      <option>Airbus A319</option>
+      <option>Airbus A320</option>
+      <option>Airbus A321</option>
+      <option>Airbus A330</option>
+      <option>Airbus A350</option>
+      <option>Airbus A380</option>
+      <option>Boeing 737</option>
+      <option>Boeing 747</option>
+      <option>Boeing 767</option>
+      <option>Boeing 777</option>
+      <option>Boeing 787</option>
+    </select>
+
+    <!-- Check Manager: type OR choose -->
+    <input type="text" id="check-manager" placeholder="Check Manager (type or choose below)" list="check-manager-list" />
+    <datalist id="check-manager-list">
+      <option value="ALEX"></option>
+      <option value="BILAL"></option>
+      <option value="BRUNO"></option>
+      <option value="FAIZ"></option>
+      <option value="HUMAYUN"></option>
+      <option value="ISMAIL"></option>
+      <option value="JETRO"></option>
+      <option value="KHALID"></option>
+      <option value="KULAIDI"></option>
+      <option value="SAMI"></option>
+      <option value="SCOOBY"></option>
+      <option value="SINAN"></option>
+      <option value="SUMAN"></option>
+    </datalist>
+
+    <input type="text" id="engineer" placeholder="Engineer Name" />
+
+    <button id="btn-submit-aircraft" class="blue-btn">Submit</button>
+
+    <p id="aircraft-message" class="message hidden"></p>
+    <button id="btn-back-from-aircraft" class="red-btn">Back</button>
+  </div>
+
 </div>
 
 <script>
@@ -215,6 +282,9 @@ const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9
 const getTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85dc1a9c07834f938c74cdde1f3f2978/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KFlDrPLxUmV2HA74dETukVis0W8-xJfhD5Bf5BB6iIQ";
 const updateTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fc5ee9e607714150bbbfe4fc1984833c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=eJvhsh7X_vbPGVYmmkUz7xcxvimDlwQY7BZs4uYYnJ8";
 
+// ✅ NEW: AIRCRAFT ALLOCATION UPDATE FLOW URL (PASTE YOUR NEW FLOW URL HERE)
+const updateAircraftAllocationUrl = "PASTE_YOUR_NEW_FLOW_URL_HERE";
+
 // === NEW: Location Gate Settings ===
 const AUTH_LAT = 24.43631074997773;
 const AUTH_LNG = 54.633581449737385;
@@ -222,15 +292,19 @@ const AUTH_RADIUS_METERS = 100;
 
 // === Utility functions ===
 function showSection(sectionId) {
-  ['location-section','registration-section', 'otp-section', 'login-section', 'dashboard-section', 'attendance-section', 'attendance-result-section','taskcount-section','taskcount-success-section'].forEach(id => {
+  ['location-section','registration-section', 'otp-section', 'login-section', 'dashboard-section',
+   'attendance-section', 'attendance-result-section','taskcount-section','taskcount-success-section',
+   'aircraft-section'
+  ].forEach(id => {
     document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
   });
   clearMessages();
 }
 
 function clearMessages() {
-  ['reg-message', 'otp-message', 'login-message', 'attendance-message','taskcount-message'].forEach(id => {
+  ['reg-message', 'otp-message', 'login-message', 'attendance-message','taskcount-message','aircraft-message'].forEach(id => {
     const el = document.getElementById(id);
+    if(!el) return;
     el.className = 'message hidden';
     el.textContent = '';
   });
@@ -245,9 +319,8 @@ function showMessage(id, text, isError = true) {
 
 function getCurrentUAETimeISO() {
   const now = new Date();
-  // UAE is UTC+4
   const uaeTime = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-  return uaeTime.toISOString().slice(0,19); // YYYY-MM-DDTHH:mm:ss
+  return uaeTime.toISOString().slice(0,19);
 }
 
 // === Location Distance (Haversine) ===
@@ -264,13 +337,11 @@ function distanceMeters(lat1, lon1, lat2, lon2){
   return R * c;
 }
 
-// === Location Gate helpers ===
 function setLocationText(t){
   const el = document.getElementById('location-text');
   if(el) el.textContent = t;
 }
 
-// NEW: After location check, go to attendance (only) — called from Attendance button
 function proceedAfterLocationCheck_AttendanceOnly(){
   showSection('attendance-section');
   loadAttendanceDetails();
@@ -309,14 +380,12 @@ function verifyLocationGate_AttendanceOnly(){
   );
 }
 
-// === Show Result Page ===
 function showAttendanceResult(messageText) {
   const msg = document.getElementById('attendance-result-message');
   msg.textContent = messageText;
   showSection('attendance-result-section');
 }
 
-// === Check if attendance already marked today (ONLY when Attendance is opened) ===
 async function checkAttendanceTodayAndLock() {
   const studentID = sessionStorage.getItem('loggedInStudentID');
   if(!studentID) return;
@@ -336,12 +405,9 @@ async function checkAttendanceTodayAndLock() {
       showAttendanceResult('✅ Your attendance has already been marked for today 😊');
       return;
     }
-  } catch(e) {
-    // If check fails, do not block the student
-  }
+  } catch(e) {}
 }
 
-// === NEW: Load Task Count from SharePoint via Flow ===
 async function loadTaskCountFromSharePoint() {
   const studentID = sessionStorage.getItem('loggedInStudentID');
   if(!studentID) return;
@@ -365,11 +431,8 @@ async function loadTaskCountFromSharePoint() {
 
       document.getElementById('taskcount-last-date').textContent =
         data.submittedOn ? data.submittedOn : '-';
-
     }
-  } catch(e) {
-    // do not block
-  }
+  } catch(e) {}
 }
 
 // === Password show/hide toggle ===
@@ -385,7 +448,6 @@ document.getElementById('show-password').addEventListener('change', e => {
   }
 });
 
-// Enable Send OTP button only if inputs are filled and passwords match
 function validateRegistrationInputs() {
   const id = document.getElementById('reg-student-id').value.trim();
   const name = document.getElementById('reg-student-name').value.trim();
@@ -422,7 +484,6 @@ document.getElementById('btn-send-otp').addEventListener('click', async () => {
   showMessage('reg-message', 'Validating user...', false);
 
   try {
-    // Validate student existence in OJE TRAINEE MASTER DATA
     const validateResponse = await fetch(validateStudentExistenceUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -436,10 +497,8 @@ document.getElementById('btn-send-otp').addEventListener('click', async () => {
       return;
     }
 
-    // Save entered data temporarily in sessionStorage for OTP step
     sessionStorage.setItem('regTempData', JSON.stringify({id, name, email, password}));
 
-    // Call SendOTP flow with Email
     const sendOtpResponse = await fetch(sendOtpUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -448,8 +507,6 @@ document.getElementById('btn-send-otp').addEventListener('click', async () => {
     if(!sendOtpResponse.ok) throw new Error('Failed to send OTP');
 
     showMessage('otp-message', 'OTP sent! Please check your email.', false);
-
-    // Move to OTP section
     showSection('otp-section');
 
   } catch (err) {
@@ -489,7 +546,6 @@ document.getElementById('btn-verify-otp').addEventListener('click', async () => 
       return;
     }
 
-    // OTP verified - create registration in SharePoint
     showMessage('otp-message', 'OTP verified! Creating registration...', false);
 
     const createResponse = await fetch(createRegistrationUrl, {
@@ -508,7 +564,6 @@ document.getElementById('btn-verify-otp').addEventListener('click', async () => 
     showMessage('otp-message', 'Registration successful! Please login.', false);
     sessionStorage.removeItem('regTempData');
 
-    // Show login section after short delay
     setTimeout(() => {
       showSection('login-section');
       clearRegistrationForm();
@@ -519,7 +574,6 @@ document.getElementById('btn-verify-otp').addEventListener('click', async () => 
   }
 });
 
-// Resend OTP button
 document.getElementById('btn-resend-otp').addEventListener('click', async () => {
   clearMessages();
   const tempDataStr = sessionStorage.getItem('regTempData');
@@ -542,7 +596,6 @@ document.getElementById('btn-resend-otp').addEventListener('click', async () => 
   }
 });
 
-// === Clear registration form inputs ===
 function clearRegistrationForm() {
   ['reg-student-id','reg-student-name','reg-student-email','reg-password','reg-password-confirm'].forEach(id => {
     document.getElementById(id).value = '';
@@ -577,12 +630,10 @@ document.getElementById('btn-login').addEventListener('click', async () => {
       return;
     }
 
-    // Save login email in sessionStorage
     sessionStorage.setItem('loggedInEmail', email);
     sessionStorage.setItem('loggedInName', loginResult.name || '');
     sessionStorage.setItem('loggedInStudentID', loginResult.studentID || '');
 
-    // AFTER LOGIN -> DASHBOARD (NOT attendance)
     showSection('dashboard-section');
 
   } catch (err) {
@@ -590,12 +641,10 @@ document.getElementById('btn-login').addEventListener('click', async () => {
   }
 });
 
-// Show login form when user clicks Register Instead
 document.getElementById('btn-to-register').addEventListener('click', () => {
   showSection('registration-section');
 });
 
-// Show login form when clicking the Login button on Registration page
 document.getElementById('btn-go-to-login').addEventListener('click', () => {
   showSection('login-section');
   clearMessages();
@@ -603,13 +652,19 @@ document.getElementById('btn-go-to-login').addEventListener('click', () => {
 
 // === DASHBOARD BUTTONS ===
 document.getElementById('btn-dashboard-attendance').addEventListener('click', async () => {
-  // move location gate + already-marked check inside Attendance access
   sessionStorage.setItem('locationVerified', 'false');
   verifyLocationGate_AttendanceOnly();
 });
 
+// ✅ Aircraft Allocation button now opens the form
 document.getElementById('btn-dashboard-aircraft').addEventListener('click', () => {
-  showAttendanceResult('🚧 Aircraft Allocation - Coming Soon');
+  // clear fields each time
+  document.getElementById('aircraft-location').value = '';
+  document.getElementById('aircraft-registration').value = '';
+  document.getElementById('aircraft-type').value = '';
+  document.getElementById('check-manager').value = '';
+  document.getElementById('engineer').value = '';
+  showSection('aircraft-section');
 });
 
 document.getElementById('btn-dashboard-taskcount').addEventListener('click', async () => {
@@ -627,17 +682,73 @@ document.getElementById('btn-logout-dashboard').addEventListener('click', () => 
 document.getElementById('btn-back-from-attendance').addEventListener('click', () => {
   showSection('dashboard-section');
 });
-
 document.getElementById('btn-back-from-result').addEventListener('click', () => {
   showSection('dashboard-section');
 });
-
 document.getElementById('btn-back-from-location').addEventListener('click', () => {
   showSection('dashboard-section');
 });
-
 document.getElementById('btn-back-from-taskcount').addEventListener('click', () => {
   showSection('dashboard-section');
+});
+document.getElementById('btn-back-from-aircraft').addEventListener('click', () => {
+  showSection('dashboard-section');
+});
+
+// === SUBMIT AIRCRAFT ALLOCATION ===
+document.getElementById('btn-submit-aircraft').addEventListener('click', async () => {
+  clearMessages();
+
+  const studentID = sessionStorage.getItem('loggedInStudentID');
+  if(!studentID) {
+    showMessage('aircraft-message', 'You are not logged in.');
+    showSection('login-section');
+    return;
+  }
+
+  const AircraftLocation = document.getElementById('aircraft-location').value;
+  const AircraftRegistration = document.getElementById('aircraft-registration').value.trim();
+  const AircraftType = document.getElementById('aircraft-type').value;
+  const CheckManager = document.getElementById('check-manager').value.trim();
+  const Engineer = document.getElementById('engineer').value.trim();
+
+  if(!AircraftLocation || !AircraftType) {
+    showMessage('aircraft-message', 'Please select Location and Aircraft Type.');
+    return;
+  }
+
+  try {
+    const res = await fetch(updateAircraftAllocationUrl, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        StudentID: studentID,
+        AircraftLocation,
+        AircraftRegistration,
+        AircraftType,
+        CheckManager,
+        Engineer
+      })
+    });
+
+    if(!res.ok) throw new Error('Failed to update aircraft allocation');
+
+    let data = null;
+    const raw = await res.text();
+    if(raw) {
+      try { data = JSON.parse(raw); } catch(e) { data = null; }
+    }
+
+    if(data && data.success === false) {
+      showMessage('aircraft-message', data.message || 'Update failed.');
+      return;
+    }
+
+    showMessage('aircraft-message', '✅ Aircraft allocation updated successfully.', false);
+
+  } catch(err) {
+    showMessage('aircraft-message', 'Error: ' + err.message);
+  }
 });
 
 // === NEW: SUBMIT TASK COUNT ===
@@ -659,7 +770,6 @@ document.getElementById('btn-submit-taskcount').addEventListener('click', async 
     return;
   }
 
-  // Always today's date/time
   const submittedOn = new Date().toISOString();
 
   try {
@@ -704,14 +814,11 @@ function loadAttendanceDetails() {
   document.getElementById('attendee-email').textContent = document.getElementById('current-datetime').textContent;
 
   updateCurrentDateTime();
-
-  // NOW: check already-marked only when Attendance is opened
   checkAttendanceTodayAndLock();
 }
 
 function updateCurrentDateTime() {
   const now = new Date();
-  /* CHANGED ONLY HERE: removed +4 hours addition */
   const uaeTime = new Date(now.getTime());
   document.getElementById('current-datetime').textContent = uaeTime.toLocaleString();
 
@@ -736,7 +843,6 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     return;
   }
 
-  // === If already marked today, redirect to result page ===
   try {
     const chk = await fetch(checkAttendanceTodayUrl, {
       method: 'POST',
@@ -751,12 +857,9 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
         return;
       }
     }
-  } catch(e) {
-    // if check fails, continue to allow marking (do not block)
-  }
+  } catch(e) {}
 
   try {
-    // Call attendance flow (pass email + timestamp)
     const attendanceResponse = await fetch(attendanceFlowUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -770,7 +873,6 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
 
     if(!attendanceResponse.ok) throw new Error('Failed to mark attendance');
 
-    // ===== FIX: handle empty response body safely (do not change anything else) =====
     let attendanceResult = null;
     const raw = await attendanceResponse.text();
     if (raw) {
@@ -780,10 +882,8 @@ document.getElementById('btn-mark-attendance').addEventListener('click', async (
     if(attendanceResult && attendanceResult.success === false) {
       showMessage('attendance-message', attendanceResult.message || 'Failed to mark attendance.');
     } else {
-      // === Redirect to result page after success ===
       showAttendanceResult('✅ Attendance submitted successfully!');
     }
-    // ===== END FIX =====
 
   } catch(err) {
     showMessage('attendance-message', 'Error: ' + err.message);
@@ -798,14 +898,12 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 
 // === On page load ===
 window.onload = () => {
-  // No location gate on site visit anymore
   if(sessionStorage.getItem('loggedInEmail')) {
     showSection('dashboard-section');
   } else {
     showSection('login-section');
   }
 };
-
 </script>
 
 </body>
