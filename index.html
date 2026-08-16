@@ -306,8 +306,6 @@
     box-shadow: 0 0 0 1px #b28b3f;
   }
 
-  /* === LOGIN PASSWORD EYE === */
-
   #login-section .login-password-field input {
     padding-right: 70px;
   }
@@ -383,6 +381,75 @@
     color: #b28b3f;
   }
 
+  /* =========================================================
+     DASHBOARD PAGE
+     Same visual theme as the Login page.
+     Existing functionality and other page styles are unchanged.
+     ========================================================= */
+
+  body:has(#dashboard-section:not(.hidden)) {
+    min-height: 100vh;
+    align-items: center;
+    box-sizing: border-box;
+    background: #eef1f4;
+    padding: 20px;
+  }
+
+  .container:has(#dashboard-section:not(.hidden)) {
+    width: 100%;
+    max-width: 590px;
+    padding: 48px 48px 42px 48px;
+    border-radius: 26px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+  }
+
+  #dashboard-section .company-logo {
+    max-width: 470px;
+    margin: 0 auto 38px auto;
+  }
+
+  #dashboard-section .page-title {
+    font-size: 50px;
+    line-height: 1.08;
+    color: #1f2d3d;
+    margin: 0 auto 14px auto;
+    max-width: 520px;
+  }
+
+  #dashboard-section .page-subtitle {
+    font-size: 28px;
+    color: #6b737b;
+    margin: 0 0 34px 0;
+  }
+
+  #dashboard-section .blue-btn,
+  #dashboard-section .green-btn {
+    height: 72px;
+    margin-top: 12px;
+    background: #b28b3f;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  }
+
+  #dashboard-section .blue-btn:hover,
+  #dashboard-section .green-btn:hover {
+    background: #a37d35;
+  }
+
+  #dashboard-section #btn-logout-dashboard {
+    width: auto;
+    display: block;
+    margin: 30px auto 0 auto;
+    padding: 0;
+    color: #b28b3f;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
   @media (max-width: 650px) {
 
     body:has(#login-section:not(.hidden)) {
@@ -421,7 +488,41 @@
     #login-section #btn-to-register {
       font-size: 19px;
     }
+
+    body:has(#dashboard-section:not(.hidden)) {
+      padding: 14px;
+    }
+
+    .container:has(#dashboard-section:not(.hidden)) {
+      padding: 38px 28px 34px 28px;
+      border-radius: 22px;
+    }
+
+    #dashboard-section .company-logo {
+      max-width: 100%;
+      margin-bottom: 30px;
+    }
+
+    #dashboard-section .page-title {
+      font-size: 38px;
+    }
+
+    #dashboard-section .page-subtitle {
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    #dashboard-section .blue-btn,
+    #dashboard-section .green-btn {
+      height: 62px;
+      font-size: 21px;
+    }
+
+    #dashboard-section #btn-logout-dashboard {
+      font-size: 19px;
+    }
   }
+
 </style>
 </head>
 
@@ -498,7 +599,6 @@
       required
     />
 
-    <!-- ORIGINAL SHOW PASSWORD OPTION RETAINED -->
     <label>
       <input type="checkbox" id="show-password">
       Show Password
@@ -552,8 +652,6 @@
 
   <div id="login-section" class="hidden">
 
-    <!-- COMPANY LOGO ADDED -->
-
     <img
       src="NEW_ENGINEERING_LOGO_TECHNICAL_TRAINING.png"
       class="company-logo"
@@ -596,7 +694,6 @@
         required
       />
 
-      <!-- LOGIN EYE BUTTON -->
       <button
         type="button"
         id="btn-toggle-login-password"
@@ -610,8 +707,15 @@
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
+
           <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
-          <circle cx="12" cy="12" r="2.5"></circle>
+
+          <circle
+            cx="12"
+            cy="12"
+            r="2.5"
+          ></circle>
+
         </svg>
 
       </button>
@@ -643,8 +747,6 @@
 
   <div id="dashboard-section" class="hidden">
 
-    <!-- COMPANY LOGO ADDED -->
-
     <img
       src="NEW_ENGINEERING_LOGO_TECHNICAL_TRAINING.png"
       class="company-logo"
@@ -670,8 +772,6 @@
     <button id="btn-dashboard-taskcount" class="blue-btn">
       Task Count
     </button>
-
-    <!-- DAILY SIGN-OUT - GREEN -->
 
     <button id="btn-dashboard-signout" class="green-btn">
       Daily Sign-Out
@@ -929,8 +1029,6 @@
       Back
     </button>
 
-    <!-- LAST ALLOCATION CARD -->
-
     <div class="info-card">
 
       <div class="small-heading">
@@ -972,40 +1070,29 @@
 
 // ==== Flow URLs ====
 
-const validateStudentExistenceUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/d2fd8d79a22c4ea5ada0c512eaac3257/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QN_nVZLNHyUGxSBgC5sM2VSp5o1_Uqohoevm5bKRXk";
+const validateStudentExistenceUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/d2fd8d79a22c4ea5ada0c512eaac3257/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=QN_nV-ZLNHyUGxSBgC5sM2VSp5o1_Uqohoevm5bKRXk";
 
-const sendOtpUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/c3340d8bb42a415cb1932224e0625722/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KuDuKpT56nk7IaIXYg9ywDCitNF4E96swrAeXJ00h4Q";
+const sendOtpUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/c3340d8bb42a415cb1932224e0625722/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KuDuKpT56nk7IaIXYg9ywDCitNF4E96swrAeXJ00h4Q";
 
-const verifyOtpUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/ad9257dcff9b4f709459576e558ad7a6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jrQnda9Jr_Opg_cQaLoSSC1ZInoi5d1uvO7J7B-4wQ";
+const verifyOtpUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/ad9257dcff9b4f709459576e558ad7a6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jrQnda9Jr_Opg_c-QaLoSSC1ZInoi5d1uvO7J7B-4wQ";
 
-const createRegistrationUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/da543851a92f4e6d81aab7056650b8dd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0s7uFvz6dPm1zfJIWTnpq4RzzuaJXNgx6AgHFZxegrg";
+const createRegistrationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/da543851a92f4e6d81aab7056650b8dd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0s7uFvz6dPm1zfJIWTnpq4RzzuaJXNgx6AgHFZxegrg";
 
-const checkLoginCredentialsUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/61a88948acdb477ebc866ac5ea518906/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-TNlSxMBeur6V4y7JinLwp8Is3gb2L4tQpxGEDKXCCk";
+const checkLoginCredentialsUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/61a88948acdb477ebc866ac5ea518906/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-TNlSxMBeur6V4y7JinLwp8Is3gb2L4tQpxGEDKXCCk";
 
-const attendanceFlowUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
+const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
-const checkAttendanceTodayUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSYf9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
+const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSY-f9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
 
-const getTaskCountUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85dc1a9c07834f938c74cdde1f3f2978/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KFlDrPLxUmV2HA74dETukVis0W8-xJfhD5Bf5BB6iIQ";
+const getTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85dc1a9c07834f938c74cdde1f3f2978/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KFlDrPLxUmV2HA74dETukVis0W8-xJfhD5Bf5BB6iIQ";
 
-const updateTaskCountUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fc5ee9e607714150bbbfe4fc1984833c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=eJvhsh7X_vbPGVYmmkUz7xcxvimDlwQY7BZs4uYYnJ8";
+const updateTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fc5ee9e607714150bbbfe4fc1984833c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=eJvhsh7X_vbPGVYmmkUz7xcxvimDlwQY7BZs4uYYnJ8";
 
 // === Aircraft Allocation Flows ===
 
-const updateAircraftAllocationUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e4708a1e9007427da4cadc4684f0d036/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5umQLNm7vhvXmczOHGd0eOKrbRKahNLC57HHRV8OE1U";
+const updateAircraftAllocationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e4708a1e9007427da4cadc4684f0d036/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5umQLNm7vhvXmczOHGd0eOKrbRKahNLC57HHRV8OE1U";
 
-const getAircraftAllocationUrl =
-"https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f34cc8a4fd422aa1ca016336294ab6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=sgADXqmYgYzEjXYSw4Tc-sWitB6w5EfOKm5Y9u9XtKI";
+const getAircraftAllocationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f34cc8a4fd422aa1ca016336294ab6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=sgADXqmYgYzEjXYSw4Tc-sWitB6w5EfOKm5Y9u9XtKI";
 
 // === Location Gate Settings ===
 
@@ -1051,8 +1138,7 @@ function clearMessages() {
     'aircraft-message'
   ].forEach(id => {
 
-    const el =
-      document.getElementById(id);
+    const el = document.getElementById(id);
 
     if (!el) return;
 
@@ -1065,8 +1151,7 @@ function clearMessages() {
 
 function showMessage(id, text, isError = true) {
 
-  const el =
-    document.getElementById(id);
+  const el = document.getElementById(id);
 
   el.textContent = text;
 
@@ -1078,9 +1163,7 @@ function showMessage(id, text, isError = true) {
 
 
 function toRad(x) {
-
   return x * Math.PI / 180;
-
 }
 
 
@@ -1088,16 +1171,11 @@ function distanceMeters(lat1, lon1, lat2, lon2) {
 
   const R = 6371000;
 
-  const dLat =
-    toRad(lat2 - lat1);
-
-  const dLon =
-    toRad(lon2 - lon1);
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
 
   const a =
-    Math.sin(dLat / 2) *
-    Math.sin(dLat / 2) +
-
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) *
     Math.cos(toRad(lat2)) *
     Math.sin(dLon / 2) *
@@ -1110,21 +1188,16 @@ function distanceMeters(lat1, lon1, lat2, lon2) {
     );
 
   return R * c;
-
 }
 
 
 function setLocationText(t) {
 
-  const el =
-    document.getElementById('location-text');
+  const el = document.getElementById('location-text');
 
   if (el) {
-
     el.textContent = t;
-
   }
-
 }
 
 
@@ -1133,7 +1206,6 @@ function proceedAfterLocationCheck_AttendanceOnly() {
   showSection('attendance-section');
 
   loadAttendanceDetails();
-
 }
 
 
@@ -1157,26 +1229,21 @@ function verifyLocationGate_AttendanceOnly() {
     );
 
     return;
-
   }
 
   navigator.geolocation.getCurrentPosition(
 
     (pos) => {
 
-      const lat =
-        pos.coords.latitude;
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
 
-      const lng =
-        pos.coords.longitude;
-
-      const d =
-        distanceMeters(
-          lat,
-          lng,
-          AUTH_LAT,
-          AUTH_LNG
-        );
+      const d = distanceMeters(
+        lat,
+        lng,
+        AUTH_LAT,
+        AUTH_LNG
+      );
 
       if (d <= AUTH_RADIUS_METERS) {
 
@@ -1222,7 +1289,6 @@ function verifyLocationGate_AttendanceOnly() {
     }
 
   );
-
 }
 
 
@@ -1238,7 +1304,6 @@ function showAttendanceResult(messageText) {
   showSection(
     'attendance-result-section'
   );
-
 }
 
 
@@ -1253,22 +1318,20 @@ async function checkAttendanceTodayAndLock() {
 
   try {
 
-    const res =
-      await fetch(
-        checkAttendanceTodayUrl,
-        {
-          method: 'POST',
+    const res = await fetch(
+      checkAttendanceTodayUrl,
+      {
+        method: 'POST',
 
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
+        headers: {
+          'Content-Type': 'application/json'
+        },
 
-          body: JSON.stringify({
-            StudentID: studentID
-          })
-        }
-      );
+        body: JSON.stringify({
+          StudentID: studentID
+        })
+      }
+    );
 
     if (!res.ok) {
 
@@ -1278,8 +1341,7 @@ async function checkAttendanceTodayAndLock() {
 
     }
 
-    const result =
-      await res.json();
+    const result = await res.json();
 
     if (result && result.marked) {
 
@@ -1315,22 +1377,20 @@ async function loadTaskCountFromSharePoint() {
 
   try {
 
-    const res =
-      await fetch(
-        getTaskCountUrl,
-        {
-          method: 'POST',
+    const res = await fetch(
+      getTaskCountUrl,
+      {
+        method: 'POST',
 
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
+        headers: {
+          'Content-Type': 'application/json'
+        },
 
-          body: JSON.stringify({
-            StudentID: studentID
-          })
-        }
-      );
+        body: JSON.stringify({
+          StudentID: studentID
+        })
+      }
+    );
 
     if (!res.ok) {
 
@@ -1340,8 +1400,7 @@ async function loadTaskCountFromSharePoint() {
 
     }
 
-    const data =
-      await res.json();
+    const data = await res.json();
 
     if (data && data.found) {
 
@@ -1394,22 +1453,20 @@ async function loadAircraftAllocationFromSharePoint() {
 
   try {
 
-    const res =
-      await fetch(
-        getAircraftAllocationUrl,
-        {
-          method: 'POST',
+    const res = await fetch(
+      getAircraftAllocationUrl,
+      {
+        method: 'POST',
 
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
+        headers: {
+          'Content-Type': 'application/json'
+        },
 
-          body: JSON.stringify({
-            StudentID: studentID
-          })
-        }
-      );
+        body: JSON.stringify({
+          StudentID: studentID
+        })
+      }
+    );
 
     if (!res.ok) {
 
@@ -1419,8 +1476,7 @@ async function loadAircraftAllocationFromSharePoint() {
 
     }
 
-    const data =
-      await res.json();
+    const data = await res.json();
 
     if (data && data.found) {
 
@@ -1453,7 +1509,6 @@ async function loadAircraftAllocationFromSharePoint() {
 
 
 // === Password show/hide toggle ===
-// ORIGINAL REGISTRATION FUNCTIONALITY RETAINED
 
 document
   .getElementById('show-password')
