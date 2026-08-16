@@ -240,11 +240,29 @@
     box-sizing: border-box;
     background: #eef1f4;
     padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* LOGIN PAGE BACKGROUND IMAGE ONLY */
+  body:has(#login-section:not(.hidden))::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url('engine.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 0.32;
+    z-index: 0;
+    pointer-events: none;
   }
 
   .container:has(#login-section:not(.hidden)) {
     width: 100%;
     max-width: 590px;
+    position: relative;
+    z-index: 1;
     padding: 48px 48px 42px 48px;
     border-radius: 26px;
     box-shadow: 0 14px 32px rgba(0,0,0,0.12);
