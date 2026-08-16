@@ -238,31 +238,16 @@
     min-height: 100vh;
     align-items: center;
     box-sizing: border-box;
-    background: #eef1f4;
+    background: linear-gradient(
+      rgba(238, 241, 244, 0.68),
+      rgba(238, 241, 244, 0.68)
+    ), url("engine.jpg") center center / cover no-repeat fixed;
     padding: 20px;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* LOGIN PAGE BACKGROUND IMAGE ONLY */
-  body:has(#login-section:not(.hidden))::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url('engine.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    opacity: 0.32;
-    z-index: 0;
-    pointer-events: none;
   }
 
   .container:has(#login-section:not(.hidden)) {
     width: 100%;
     max-width: 590px;
-    position: relative;
-    z-index: 1;
     padding: 48px 48px 42px 48px;
     border-radius: 26px;
     box-shadow: 0 14px 32px rgba(0,0,0,0.12);
@@ -550,28 +535,20 @@
 
   <!-- NEW: LOCATION GATE -->
   <div id="location-section" class="hidden">
-
     <div class="location-wrap">
-
       <div class="pin"></div>
-
       <div class="pin-shadow"></div>
-
       <p id="location-text" class="location-text">
         Accessing your location, please wait!
       </p>
-
     </div>
 
     <button id="btn-back-from-location" class="red-btn">
       Back
     </button>
-
   </div>
 
-
   <!-- REGISTRATION -->
-
   <div id="registration-section" class="hidden">
 
     <h2 class="page-title">
@@ -582,40 +559,15 @@
       Registration
     </p>
 
-    <input
-      type="text"
-      id="reg-student-id"
-      placeholder="Student ID"
-      required
-    />
+    <input type="text" id="reg-student-id" placeholder="Student ID" required />
 
-    <input
-      type="text"
-      id="reg-student-name"
-      placeholder="Full Name"
-      required
-    />
+    <input type="text" id="reg-student-name" placeholder="Full Name" required />
 
-    <input
-      type="email"
-      id="reg-student-email"
-      placeholder="Email"
-      required
-    />
+    <input type="email" id="reg-student-email" placeholder="Email" required />
 
-    <input
-      type="password"
-      id="reg-password"
-      placeholder="Password"
-      required
-    />
+    <input type="password" id="reg-password" placeholder="Password" required />
 
-    <input
-      type="password"
-      id="reg-password-confirm"
-      placeholder="Confirm Password"
-      required
-    />
+    <input type="password" id="reg-password-confirm" placeholder="Confirm Password" required />
 
     <label>
       <input type="checkbox" id="show-password">
@@ -631,12 +583,9 @@
     </button>
 
     <p id="reg-message" class="message hidden"></p>
-
   </div>
 
-
   <!-- OTP VERIFICATION -->
-
   <div id="otp-section" class="hidden">
 
     <h2>
@@ -647,11 +596,7 @@
       OTP sent to your email. Please enter it below:
     </p>
 
-    <input
-      type="number"
-      id="otp-input"
-      placeholder="Enter OTP"
-    />
+    <input type="number" id="otp-input" placeholder="Enter OTP" />
 
     <button id="btn-verify-otp">
       Verify OTP
@@ -662,14 +607,12 @@
     <button class="link-btn" id="btn-resend-otp">
       Resend OTP
     </button>
-
   </div>
 
-
   <!-- LOGIN -->
-
   <div id="login-section" class="hidden">
 
+    <!-- COMPANY LOGO ADDED -->
     <img
       src="NEW_ENGINEERING_LOGO_TECHNICAL_TRAINING.png"
       class="company-logo"
@@ -719,23 +662,10 @@
         aria-label="Show password"
         title="Show password"
       >
-
-        <svg
-          id="login-eye-icon"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-
+        <svg id="login-eye-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
-
-          <circle
-            cx="12"
-            cy="12"
-            r="2.5"
-          ></circle>
-
+          <circle cx="12" cy="12" r="2.5"></circle>
         </svg>
-
       </button>
 
     </div>
@@ -747,24 +677,19 @@
     <p id="login-message" class="message hidden"></p>
 
     <button class="link-btn" id="btn-to-register">
-
       <span class="register-question">
         Don't have an account?
       </span>
-
       <span class="register-link">
         Register Instead
       </span>
-
     </button>
-
   </div>
 
-
   <!-- DASHBOARD -->
-
   <div id="dashboard-section" class="hidden">
 
+    <!-- COMPANY LOGO ADDED -->
     <img
       src="NEW_ENGINEERING_LOGO_TECHNICAL_TRAINING.png"
       class="company-logo"
@@ -791,6 +716,7 @@
       Task Count
     </button>
 
+    <!-- DAILY SIGN-OUT - GREEN -->
     <button id="btn-dashboard-signout" class="green-btn">
       Daily Sign-Out
     </button>
@@ -798,12 +724,9 @@
     <button class="link-btn" id="btn-logout-dashboard">
       Logout
     </button>
-
   </div>
 
-
   <!-- ATTENDANCE -->
-
   <div id="attendance-section" class="hidden">
 
     <h2 class="page-title">
@@ -815,27 +738,18 @@
     <div class="info-card">
 
       <div class="info-row">
-
         <strong>ID:</strong>
-
         <span id="attendee-id"></span>
-
       </div>
 
       <div class="info-row">
-
         <strong>Name:</strong>
-
         <span id="attendee-name"></span>
-
       </div>
 
       <div class="info-row">
-
         <strong>Date & Time:</strong>
-
         <span id="attendee-email"></span>
-
       </div>
 
     </div>
@@ -856,9 +770,7 @@
 
   </div>
 
-
   <!-- ATTENDANCE RESULT PAGE -->
-
   <div id="attendance-result-section" class="hidden">
 
     <p id="attendance-result-message" class="message success"></p>
@@ -869,9 +781,7 @@
 
   </div>
 
-
   <!-- TASK COUNT SECTION -->
-
   <div id="taskcount-section" class="hidden">
 
     <h2 class="page-title">
@@ -895,19 +805,13 @@
     <div class="info-card">
 
       <div class="info-row">
-
         <strong>Last Task Count:</strong>
-
         <span id="taskcount-last-value">-</span>
-
       </div>
 
       <div class="info-row">
-
         <strong>Submitted On:</strong>
-
         <span id="taskcount-last-date">-</span>
-
       </div>
 
     </div>
@@ -920,9 +824,7 @@
 
   </div>
 
-
   <!-- TASK COUNT SUCCESS MESSAGE -->
-
   <div id="taskcount-success-section" class="hidden">
 
     <p id="taskcount-success-message" class="message success">
@@ -931,9 +833,7 @@
 
   </div>
 
-
   <!-- AIRCRAFT ALLOCATION -->
-
   <div id="aircraft-section" class="hidden">
 
     <h2 class="page-title">
@@ -952,26 +852,37 @@
 
       <option>H1</option>
       <option>H1-Outside</option>
+
       <option>H2</option>
       <option>H2-Outside</option>
+
       <option>H3</option>
       <option>H3-Outside</option>
+
       <option>H3-A</option>
       <option>H3-A-Outside</option>
+
       <option>H4</option>
       <option>H4-Outside</option>
+
       <option>H5</option>
       <option>H5-Outside</option>
+
       <option>H6-A</option>
       <option>H6-A-Outside</option>
+
       <option>H6-B</option>
       <option>H6-B-Outside</option>
+
       <option>H6-C</option>
       <option>H6-C-Outside</option>
+
       <option>H6-D</option>
       <option>H6-D-Outside</option>
+
       <option>H7</option>
       <option>H7-Outside</option>
+
       <option>Bay 5</option>
       <option>Bay 6</option>
       <option>Bay 7</option>
@@ -998,6 +909,7 @@
       <option>Airbus A330</option>
       <option>Airbus A350</option>
       <option>Airbus A380</option>
+
       <option>Boeing 737</option>
       <option>Boeing 747</option>
       <option>Boeing 767</option>
@@ -1047,6 +959,7 @@
       Back
     </button>
 
+    <!-- LAST ALLOCATION CARD -->
     <div class="info-card">
 
       <div class="small-heading">
@@ -1054,27 +967,18 @@
       </div>
 
       <div class="info-row">
-
         <strong>Location :</strong>
-
         <span id="last-air-location">-</span>
-
       </div>
 
       <div class="info-row">
-
         <strong>Aircraft :</strong>
-
         <span id="last-air-reg">-</span>
-
       </div>
 
       <div class="info-row">
-
         <strong>Aircraft Type :</strong>
-
         <span id="last-air-type">-</span>
-
       </div>
 
     </div>
@@ -1082,7 +986,6 @@
   </div>
 
 </div>
-
 
 <script>
 
@@ -1282,9 +1185,7 @@ function verifyLocationGate_AttendanceOnly() {
         setLocationText(
           'Please move to the authorized attendance area'
         );
-
       }
-
     },
 
     () => {
@@ -1297,7 +1198,6 @@ function verifyLocationGate_AttendanceOnly() {
       setLocationText(
         'Unable to access location, please refresh!'
       );
-
     },
 
     {
@@ -1305,7 +1205,6 @@ function verifyLocationGate_AttendanceOnly() {
       timeout: 15000,
       maximumAge: 0
     }
-
   );
 }
 
@@ -1340,11 +1239,9 @@ async function checkAttendanceTodayAndLock() {
       checkAttendanceTodayUrl,
       {
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json'
         },
-
         body: JSON.stringify({
           StudentID: studentID
         })
@@ -1352,11 +1249,9 @@ async function checkAttendanceTodayAndLock() {
     );
 
     if (!res.ok) {
-
       throw new Error(
         'Attendance check failed'
       );
-
     }
 
     const result = await res.json();
@@ -1368,11 +1263,9 @@ async function checkAttendanceTodayAndLock() {
       );
 
       return;
-
     }
 
   } catch (e) {}
-
 }
 
 
@@ -1399,11 +1292,9 @@ async function loadTaskCountFromSharePoint() {
       getTaskCountUrl,
       {
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json'
         },
-
         body: JSON.stringify({
           StudentID: studentID
         })
@@ -1411,11 +1302,9 @@ async function loadTaskCountFromSharePoint() {
     );
 
     if (!res.ok) {
-
       throw new Error(
         'Task count fetch failed'
       );
-
     }
 
     const data = await res.json();
@@ -1438,11 +1327,9 @@ async function loadTaskCountFromSharePoint() {
         data.submittedOn
           ? data.submittedOn
           : '-';
-
     }
 
   } catch (e) {}
-
 }
 
 
@@ -1475,11 +1362,9 @@ async function loadAircraftAllocationFromSharePoint() {
       getAircraftAllocationUrl,
       {
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json'
         },
-
         body: JSON.stringify({
           StudentID: studentID
         })
@@ -1487,11 +1372,9 @@ async function loadAircraftAllocationFromSharePoint() {
     );
 
     if (!res.ok) {
-
       throw new Error(
         'Allocation fetch failed'
       );
-
     }
 
     const data = await res.json();
@@ -1518,11 +1401,9 @@ async function loadAircraftAllocationFromSharePoint() {
         data.aircraftType
           ? data.aircraftType
           : '-';
-
     }
 
   } catch (e) {}
-
 }
 
 
@@ -1555,7 +1436,6 @@ document
         conf.type = 'password';
 
       }
-
     }
   );
 
@@ -1628,11 +1508,8 @@ function validateRegistrationInputs() {
         )
         .classList
         .add('hidden');
-
     }
-
   }
-
 }
 
 
@@ -1697,12 +1574,10 @@ document
             validateStudentExistenceUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 StudentID: id,
                 FullName: name,
@@ -1712,11 +1587,9 @@ document
           );
 
         if (!validateResponse.ok) {
-
           throw new Error(
             'Validation service error'
           );
-
         }
 
         const validateResult =
@@ -1731,7 +1604,6 @@ document
           );
 
           return;
-
         }
 
         sessionStorage.setItem(
@@ -1749,12 +1621,10 @@ document
             sendOtpUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 Email: email
               })
@@ -1762,11 +1632,9 @@ document
           );
 
         if (!sendOtpResponse.ok) {
-
           throw new Error(
             'Failed to send OTP'
           );
-
         }
 
         showMessage(
@@ -1785,9 +1653,7 @@ document
           'reg-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -1815,7 +1681,6 @@ document
         );
 
         return;
-
       }
 
       const tempDataStr =
@@ -1835,7 +1700,6 @@ document
         );
 
         return;
-
       }
 
       const tempData =
@@ -1848,12 +1712,10 @@ document
             verifyOtpUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 Email: tempData.email,
                 OTP: otp
@@ -1862,11 +1724,9 @@ document
           );
 
         if (!verifyResponse.ok) {
-
           throw new Error(
             'OTP verification failed'
           );
-
         }
 
         const verifyResult =
@@ -1881,7 +1741,6 @@ document
           );
 
           return;
-
         }
 
         showMessage(
@@ -1895,12 +1754,10 @@ document
             createRegistrationUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 StudentID: tempData.id,
                 FullName: tempData.name,
@@ -1912,11 +1769,9 @@ document
           );
 
         if (!createResponse.ok) {
-
           throw new Error(
             'Failed to create registration'
           );
-
         }
 
         showMessage(
@@ -1929,18 +1784,15 @@ document
           'regTempData'
         );
 
-        setTimeout(
-          () => {
+        setTimeout(() => {
 
-            showSection(
-              'login-section'
-            );
+          showSection(
+            'login-section'
+          );
 
-            clearRegistrationForm();
+          clearRegistrationForm();
 
-          },
-          1500
-        );
+        }, 1500);
 
       } catch (err) {
 
@@ -1948,9 +1800,7 @@ document
           'otp-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -1980,7 +1830,6 @@ document
         );
 
         return;
-
       }
 
       const tempData =
@@ -1993,12 +1842,10 @@ document
             sendOtpUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 Email: tempData.email
               })
@@ -2006,11 +1853,9 @@ document
           );
 
         if (!sendOtpResponse.ok) {
-
           throw new Error(
             'Failed to send OTP'
           );
-
         }
 
         showMessage(
@@ -2025,9 +1870,7 @@ document
           'otp-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -2053,7 +1896,6 @@ function clearRegistrationForm() {
   document.getElementById(
     'reg-message'
   ).classList.add('hidden');
-
 }
 
 
@@ -2154,7 +1996,6 @@ document
         );
 
         return;
-
       }
 
       try {
@@ -2164,12 +2005,10 @@ document
             checkLoginCredentialsUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 Email: email,
                 Password: password
@@ -2178,11 +2017,9 @@ document
           );
 
         if (!loginResponse.ok) {
-
           throw new Error(
             'Login failed'
           );
-
         }
 
         const loginResult =
@@ -2197,7 +2034,6 @@ document
           );
 
           return;
-
         }
 
         sessionStorage.setItem(
@@ -2225,9 +2061,7 @@ document
           'login-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -2241,7 +2075,6 @@ document
       showSection(
         'registration-section'
       );
-
     }
   );
 
@@ -2257,7 +2090,6 @@ document
       );
 
       clearMessages();
-
     }
   );
 
@@ -2276,7 +2108,6 @@ document
       );
 
       verifyLocationGate_AttendanceOnly();
-
     }
   );
 
@@ -2312,7 +2143,6 @@ document
       ).value = '';
 
       await loadAircraftAllocationFromSharePoint();
-
     }
   );
 
@@ -2332,12 +2162,13 @@ document
       ).value = '';
 
       await loadTaskCountFromSharePoint();
-
     }
   );
 
 
 // === DAILY SIGN-OUT BUTTON ===
+// Green button added to Dashboard.
+// No other existing functionality is changed.
 
 document
   .getElementById('btn-dashboard-signout')
@@ -2358,7 +2189,6 @@ document
       setLocationText(
         'Accessing your location, please wait!'
       );
-
     }
   );
 
@@ -2374,7 +2204,6 @@ document
       showSection(
         'login-section'
       );
-
     }
   );
 
@@ -2390,7 +2219,6 @@ document
       showSection(
         'dashboard-section'
       );
-
     }
   );
 
@@ -2404,7 +2232,6 @@ document
       showSection(
         'dashboard-section'
       );
-
     }
   );
 
@@ -2418,7 +2245,6 @@ document
       showSection(
         'dashboard-section'
       );
-
     }
   );
 
@@ -2432,7 +2258,6 @@ document
       showSection(
         'dashboard-section'
       );
-
     }
   );
 
@@ -2446,7 +2271,6 @@ document
       showSection(
         'dashboard-section'
       );
-
     }
   );
 
@@ -2478,7 +2302,6 @@ document
         );
 
         return;
-
       }
 
       const rawVal =
@@ -2500,7 +2323,6 @@ document
         );
 
         return;
-
       }
 
       const submittedOn =
@@ -2513,12 +2335,10 @@ document
             updateTaskCountUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 StudentID: studentID,
                 TaskCount: taskCount,
@@ -2528,11 +2348,9 @@ document
           );
 
         if (!res.ok) {
-
           throw new Error(
             'Failed to update task count'
           );
-
         }
 
         showSection(
@@ -2562,9 +2380,7 @@ document
           'taskcount-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -2596,7 +2412,6 @@ document
         );
 
         return;
-
       }
 
       const loc =
@@ -2632,7 +2447,6 @@ document
         );
 
         return;
-
       }
 
       try {
@@ -2642,12 +2456,10 @@ document
             updateAircraftAllocationUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
 
                 StudentID: studentID,
@@ -2663,7 +2475,6 @@ document
                 Engineer: eng
 
               })
-
             }
           );
 
@@ -2672,7 +2483,6 @@ document
           throw new Error(
             'Failed to update allocation'
           );
-
         }
 
         showMessage(
@@ -2689,9 +2499,7 @@ document
           'aircraft-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -2722,7 +2530,6 @@ function loadAttendanceDetails() {
     );
 
     return;
-
   }
 
   document.getElementById(
@@ -2745,7 +2552,6 @@ function loadAttendanceDetails() {
   updateCurrentDateTime();
 
   checkAttendanceTodayAndLock();
-
 }
 
 
@@ -2781,11 +2587,8 @@ function updateCurrentDateTime() {
         document.getElementById(
           'current-datetime'
         ).textContent;
-
     }
-
   }
-
 }
 
 
@@ -2832,7 +2635,6 @@ document
         );
 
         return;
-
       }
 
       try {
@@ -2842,12 +2644,10 @@ document
             checkAttendanceTodayUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
                 StudentID: studentID
               })
@@ -2869,9 +2669,7 @@ document
             );
 
             return;
-
           }
-
         }
 
       } catch (e) {}
@@ -2883,12 +2681,10 @@ document
             attendanceFlowUrl,
             {
               method: 'POST',
-
               headers: {
                 'Content-Type':
                   'application/json'
               },
-
               body: JSON.stringify({
 
                 Email: email,
@@ -2901,7 +2697,6 @@ document
                   new Date().toISOString()
 
               })
-
             }
           );
 
@@ -2910,7 +2705,6 @@ document
           throw new Error(
             'Failed to mark attendance'
           );
-
         }
 
         let attendanceResult = null;
@@ -2928,9 +2722,7 @@ document
           } catch (e) {
 
             attendanceResult = null;
-
           }
-
         }
 
         if (
@@ -2949,7 +2741,6 @@ document
           showAttendanceResult(
             '✅ Attendance submitted successfully!'
           );
-
         }
 
       } catch (err) {
@@ -2958,9 +2749,7 @@ document
           'attendance-message',
           'Error: ' + err.message
         );
-
       }
-
     }
   );
 
@@ -2978,7 +2767,6 @@ document
       showSection(
         'login-section'
       );
-
     }
   );
 
@@ -3002,9 +2790,7 @@ window.onload = () => {
     showSection(
       'login-section'
     );
-
   }
-
 };
 
 </script>
