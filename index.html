@@ -234,21 +234,20 @@
      Visual styling to match the provided login screenshot.
      ========================================================= */
 
-  body:has(#login-section:not(.hidden)) {
+  body:has(#login-section[style*="display: block"]) {
     min-height: 100vh;
     align-items: center;
     box-sizing: border-box;
     background: linear-gradient(
-      rgba(238, 241, 244, 0.38),
-      rgba(238, 241, 244, 0.38)
+      rgba(238, 241, 244, 0.68),
+      rgba(238, 241, 244, 0.68)
     ), url("engine.jpg") center center / cover no-repeat fixed;
     padding: 20px;
   }
 
-  .container:has(#login-section:not(.hidden)) {
+  .container:has(#login-section[style*="display: block"]) {
     width: 100%;
     max-width: 590px;
-    background: rgba(255, 255, 255, 0.82);
     padding: 48px 48px 42px 48px;
     border-radius: 26px;
     box-shadow: 0 14px 32px rgba(0,0,0,0.12);
@@ -456,11 +455,11 @@
 
   @media (max-width: 650px) {
 
-    body:has(#login-section:not(.hidden)) {
+    body:has(#login-section[style*="display: block"]) {
       padding: 14px;
     }
 
-    .container:has(#login-section:not(.hidden)) {
+    .container:has(#login-section[style*="display: block"]) {
       padding: 38px 28px 34px 28px;
       border-radius: 22px;
     }
