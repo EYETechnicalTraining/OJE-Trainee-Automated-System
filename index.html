@@ -228,6 +228,304 @@
     color: #333;
     margin: 0 0 6px 0;
   }
+
+  /* =========================================================
+     LOGIN PAGE ONLY
+     Visual styling to match the provided login screenshot.
+     ========================================================= */
+
+  body:has(#login-section[style*="display: block"]) {
+    min-height: 100vh;
+    align-items: center;
+    box-sizing: border-box;
+    background: linear-gradient(
+      rgba(238, 241, 244, 0.68),
+      rgba(238, 241, 244, 0.68)
+    ), url("engine.jpg") center center / cover no-repeat fixed;
+    padding: 20px;
+  }
+
+  .container:has(#login-section[style*="display: block"]) {
+    width: 100%;
+    max-width: 590px;
+    padding: 48px 48px 42px 48px;
+    border-radius: 26px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+  }
+
+  #login-section .company-logo {
+    max-width: 470px;
+    margin: 0 auto 38px auto;
+  }
+
+  #login-section .page-title {
+    font-size: 50px;
+    line-height: 1.08;
+    color: #1f2d3d;
+    margin: 0 auto 14px auto;
+    max-width: 520px;
+  }
+
+  #login-section .page-subtitle {
+    font-size: 28px;
+    color: #6b737b;
+    margin: 0 0 34px 0;
+  }
+
+  #login-section .login-field {
+    position: relative;
+    margin: 0 0 28px 0;
+  }
+
+  #login-section .login-field label {
+    position: absolute;
+    top: -10px;
+    left: 18px;
+    padding: 0 7px;
+    background: #fff;
+    color: #68717a;
+    font-size: 18px;
+    line-height: 20px;
+    z-index: 1;
+  }
+
+  #login-section .login-field input {
+    width: 100%;
+    height: 78px;
+    padding: 20px 20px;
+    margin: 0;
+    border: 1px solid #c8cdd2;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background: #fff;
+    color: #1f2328;
+    font-size: 24px;
+    outline: none;
+  }
+
+  #login-section .login-field input:focus {
+    border-color: #b28b3f;
+    box-shadow: 0 0 0 1px #b28b3f;
+  }
+
+  #login-section .login-password-field input {
+    padding-right: 70px;
+  }
+
+  #login-section .password-eye {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    color: #68717a;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  #login-section .password-eye:hover {
+    background: transparent;
+    color: #b28b3f;
+  }
+
+  #login-section .password-eye svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #login-section #btn-login {
+    height: 72px;
+    margin-top: 0;
+    background: #b28b3f;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  }
+
+  #login-section #btn-login:hover {
+    background: #a37d35;
+  }
+
+  #login-section #login-message {
+    margin: 14px 0 0 0;
+  }
+
+  #login-section #btn-to-register {
+    width: auto;
+    display: block;
+    margin: 30px auto 0 auto;
+    padding: 0;
+    color: #b28b3f;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  #login-section .register-question {
+    color: #1f2d3d;
+  }
+
+  #login-section .register-link {
+    color: #b28b3f;
+  }
+
+  /* =========================================================
+     DASHBOARD PAGE
+     Same visual theme as the Login page.
+     Existing functionality and other page styles are unchanged.
+     ========================================================= */
+
+  body:has(#dashboard-section:not(.hidden)) {
+    min-height: 100vh;
+    align-items: center;
+    box-sizing: border-box;
+    background: #eef1f4;
+    padding: 20px;
+  }
+
+  .container:has(#dashboard-section:not(.hidden)) {
+    width: 100%;
+    max-width: 590px;
+    padding: 48px 48px 42px 48px;
+    border-radius: 26px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+  }
+
+  #dashboard-section .company-logo {
+    max-width: 470px;
+    margin: 0 auto 38px auto;
+  }
+
+  #dashboard-section .page-title {
+    font-size: 50px;
+    line-height: 1.08;
+    color: #1f2d3d;
+    margin: 0 auto 14px auto;
+    max-width: 520px;
+  }
+
+  #dashboard-section .page-subtitle {
+    font-size: 28px;
+    color: #6b737b;
+    margin: 0 0 34px 0;
+  }
+
+  #dashboard-section .blue-btn,
+  #dashboard-section .green-btn {
+    height: 72px;
+    margin-top: 12px;
+    background: #b28b3f;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  }
+
+  #dashboard-section .blue-btn:hover,
+  #dashboard-section .green-btn:hover {
+    background: #a37d35;
+  }
+
+  #dashboard-section #btn-logout-dashboard {
+    width: auto;
+    display: block;
+    margin: 30px auto 0 auto;
+    padding: 0;
+    color: #b28b3f;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  @media (max-width: 650px) {
+
+    body:has(#login-section[style*="display: block"]) {
+      padding: 14px;
+    }
+
+    .container:has(#login-section[style*="display: block"]) {
+      padding: 38px 28px 34px 28px;
+      border-radius: 22px;
+    }
+
+    #login-section .company-logo {
+      max-width: 100%;
+      margin-bottom: 30px;
+    }
+
+    #login-section .page-title {
+      font-size: 38px;
+    }
+
+    #login-section .page-subtitle {
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    #login-section .login-field input {
+      height: 66px;
+      font-size: 20px;
+    }
+
+    #login-section #btn-login {
+      height: 62px;
+      font-size: 21px;
+    }
+
+    #login-section #btn-to-register {
+      font-size: 19px;
+    }
+
+    body:has(#dashboard-section:not(.hidden)) {
+      padding: 14px;
+    }
+
+    .container:has(#dashboard-section:not(.hidden)) {
+      padding: 38px 28px 34px 28px;
+      border-radius: 22px;
+    }
+
+    #dashboard-section .company-logo {
+      max-width: 100%;
+      margin-bottom: 30px;
+    }
+
+    #dashboard-section .page-title {
+      font-size: 38px;
+    }
+
+    #dashboard-section .page-subtitle {
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    #dashboard-section .blue-btn,
+    #dashboard-section .green-btn {
+      height: 62px;
+      font-size: 21px;
+    }
+
+    #dashboard-section #btn-logout-dashboard {
+      font-size: 19px;
+    }
+  }
+
 </style>
 </head>
 
@@ -326,21 +624,65 @@
     </h2>
 
     <p class="page-subtitle">
-      Login
+      Sign In to Continue
     </p>
 
-    <input type="email" id="login-email" placeholder="Email" required />
+    <div class="login-field">
 
-    <input type="password" id="login-password" placeholder="Password" required />
+      <label for="login-email">
+        Email Address
+      </label>
+
+      <input
+        type="email"
+        id="login-email"
+        placeholder=""
+        required
+      />
+
+    </div>
+
+    <div class="login-field login-password-field">
+
+      <label for="login-password">
+        Password
+      </label>
+
+      <input
+        type="password"
+        id="login-password"
+        placeholder=""
+        required
+      />
+
+      <button
+        type="button"
+        id="btn-toggle-login-password"
+        class="password-eye"
+        aria-label="Show password"
+        title="Show password"
+      >
+        <svg id="login-eye-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+          <circle cx="12" cy="12" r="2.5"></circle>
+        </svg>
+      </button>
+
+    </div>
 
     <button id="btn-login">
-      Login
+      Sign In
     </button>
 
     <p id="login-message" class="message hidden"></p>
 
     <button class="link-btn" id="btn-to-register">
-      Register Instead
+      <span class="register-question">
+        Don't have an account?
+      </span>
+      <span class="register-link">
+        Register Instead
+      </span>
     </button>
   </div>
 
@@ -434,59 +776,6 @@
     <p id="attendance-result-message" class="message success"></p>
 
     <button id="btn-back-from-result" class="red-btn">
-      Back
-    </button>
-
-  </div>
-
-  <!-- DAILY SIGN-OUT -->
-  <div id="signout-section" class="hidden">
-
-    <h2 class="page-title">
-      Daily Sign-Out
-    </h2>
-
-    <span id="signout-current-datetime" class="hidden"></span>
-
-    <div class="info-card">
-
-      <div class="info-row">
-        <strong>ID:</strong>
-        <span id="signout-student-id"></span>
-      </div>
-
-      <div class="info-row">
-        <strong>Name:</strong>
-        <span id="signout-student-name"></span>
-      </div>
-
-      <div class="info-row">
-        <strong>Date & Time:</strong>
-        <span id="signout-datetime"></span>
-      </div>
-
-    </div>
-
-    <button id="btn-signout-submit" class="green-btn">
-      Sign-Out
-    </button>
-
-    <p id="signout-message" class="message hidden"></p>
-
-    <button id="btn-back-from-signout" class="red-btn">
-      Back
-    </button>
-
-  </div>
-
-  <!-- DAILY SIGN-OUT SUCCESS -->
-  <div id="signout-success-section" class="hidden">
-
-    <p id="signout-success-message" class="message success">
-      ✅ Sign out successful.
-    </p>
-
-    <button id="btn-back-from-signout-success" class="red-btn">
       Back
     </button>
 
@@ -714,10 +1003,6 @@ const checkLoginCredentialsUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.
 
 const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
-// === Daily Sign-Out Flow ===
-// Replace this with the HTTP URL generated by your Power Automate Sign-Out flow.
-const signOutFlowUrl = "PASTE_YOUR_SIGNOUT_FLOW_URL_HERE";
-
 const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSY-f9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
 
 const getTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85dc1a9c07834f938c74cdde1f3f2978/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KFlDrPLxUmV2HA74dETukVis0W8-xJfhD5Bf5BB6iIQ";
@@ -736,11 +1021,6 @@ const AUTH_LAT = 24.43631074997773;
 const AUTH_LNG = 54.633581449737385;
 const AUTH_RADIUS_METERS = 100;
 
-// === Daily Sign-Out Location Gate Settings ===
-const SIGNOUT_LAT = 24.466103933929684;
-const SIGNOUT_LNG = 54.37464484360332;
-const SIGNOUT_RADIUS_METERS = 5000;
-
 
 // === Utility functions ===
 
@@ -754,8 +1034,6 @@ function showSection(sectionId) {
     'dashboard-section',
     'attendance-section',
     'attendance-result-section',
-    'signout-section',
-    'signout-success-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -777,7 +1055,6 @@ function clearMessages() {
     'otp-message',
     'login-message',
     'attendance-message',
-    'signout-message',
     'taskcount-message',
     'aircraft-message'
   ].forEach(id => {
@@ -929,144 +1206,6 @@ function verifyLocationGate_AttendanceOnly() {
       maximumAge: 0
     }
   );
-}
-
-
-function verifyLocationGate_SignOut() {
-
-  showSection('location-section');
-
-  setLocationText(
-    'Accessing your location, please wait!'
-  );
-
-  if (!navigator.geolocation) {
-
-    setLocationText(
-      'Unable to access location, please refresh!'
-    );
-
-    sessionStorage.setItem(
-      'signOutLocationVerified',
-      'false'
-    );
-
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-
-    (pos) => {
-
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      const d = distanceMeters(
-        lat,
-        lng,
-        SIGNOUT_LAT,
-        SIGNOUT_LNG
-      );
-
-      if (d <= SIGNOUT_RADIUS_METERS) {
-
-        sessionStorage.setItem(
-          'signOutLocationVerified',
-          'true'
-        );
-
-        setLocationText(
-          'Location verified successfully!'
-        );
-
-        setTimeout(() => {
-          showSection('signout-section');
-          loadSignOutDetails();
-        }, 500);
-
-      } else {
-
-        sessionStorage.setItem(
-          'signOutLocationVerified',
-          'false'
-        );
-
-        setLocationText(
-          'Please move to the authorized sign-out area'
-        );
-      }
-    },
-
-    () => {
-
-      sessionStorage.setItem(
-        'signOutLocationVerified',
-        'false'
-      );
-
-      setLocationText(
-        'Unable to access location, please refresh!'
-      );
-    },
-
-    {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    }
-  );
-}
-
-
-function loadSignOutDetails() {
-
-  const name =
-    sessionStorage.getItem('loggedInName');
-
-  const studentID =
-    sessionStorage.getItem('loggedInStudentID');
-
-  if (!studentID) {
-    showSection('login-section');
-    return;
-  }
-
-  document.getElementById('signout-student-id').textContent =
-    studentID || '';
-
-  document.getElementById('signout-student-name').textContent =
-    name || '';
-
-  updateSignOutDateTime();
-}
-
-
-function updateSignOutDateTime() {
-
-  const now = new Date();
-
-  const uaeTime = new Date(
-    now.toLocaleString('en-US', { timeZone: 'Asia/Dubai' })
-  );
-
-  const text = uaeTime.toLocaleString('en-GB', {
-    timeZone: 'Asia/Dubai',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  });
-
-  document.getElementById('signout-current-datetime').textContent = text;
-  document.getElementById('signout-datetime').textContent = text;
-}
-
-
-function showSignOutSuccess() {
-  showSection('signout-success-section');
 }
 
 
@@ -1760,6 +1899,75 @@ function clearRegistrationForm() {
 }
 
 
+// === Login password show/hide toggle ===
+
+document
+  .getElementById('btn-toggle-login-password')
+  .addEventListener(
+    'click',
+    () => {
+
+      const password =
+        document.getElementById(
+          'login-password'
+        );
+
+      const button =
+        document.getElementById(
+          'btn-toggle-login-password'
+        );
+
+      const icon =
+        document.getElementById(
+          'login-eye-icon'
+        );
+
+      if (password.type === 'password') {
+
+        password.type = 'text';
+
+        button.setAttribute(
+          'aria-label',
+          'Hide password'
+        );
+
+        button.setAttribute(
+          'title',
+          'Hide password'
+        );
+
+        icon.innerHTML = `
+          <path d="M3 3l18 18"></path>
+          <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+          <path d="M9.9 5.2A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a18.2 18.2 0 0 1-3.2 3.9"></path>
+          <path d="M6.2 6.2C3.5 8.2 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.2-1"></path>
+        `;
+
+      } else {
+
+        password.type = 'password';
+
+        button.setAttribute(
+          'aria-label',
+          'Show password'
+        );
+
+        button.setAttribute(
+          'title',
+          'Show password'
+        );
+
+        icon.innerHTML = `
+          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+          <circle cx="12" cy="12" r="2.5"></circle>
+        `;
+
+      }
+
+    }
+  );
+
+
 // === Login ===
 
 document
@@ -1968,12 +2176,19 @@ document
     'click',
     () => {
 
-      sessionStorage.setItem(
-        'signOutLocationVerified',
-        'false'
+      /*
+        Daily Sign-Out functionality can be connected here.
+        The button is intentionally kept separate from
+        the existing Attendance functionality.
+      */
+
+      showSection(
+        'location-section'
       );
 
-      verifyLocationGate_SignOut();
+      setLocationText(
+        'Accessing your location, please wait!'
+      );
     }
   );
 
@@ -2056,145 +2271,6 @@ document
       showSection(
         'dashboard-section'
       );
-    }
-  );
-
-
-// === DAILY SIGN-OUT BACK BUTTONS ===
-
-document
-  .getElementById('btn-back-from-signout')
-  .addEventListener(
-    'click',
-    () => {
-      showSection('dashboard-section');
-    }
-  );
-
-
-document
-  .getElementById('btn-back-from-signout-success')
-  .addEventListener(
-    'click',
-    () => {
-      showSection('dashboard-section');
-    }
-  );
-
-
-// === SUBMIT DAILY SIGN-OUT ===
-
-document
-  .getElementById('btn-signout-submit')
-  .addEventListener(
-    'click',
-    async () => {
-
-      clearMessages();
-
-      const email =
-        sessionStorage.getItem('loggedInEmail');
-
-      const studentID =
-        sessionStorage.getItem('loggedInStudentID');
-
-      const name =
-        sessionStorage.getItem('loggedInName');
-
-      if (!email || !studentID) {
-        showMessage(
-          'signout-message',
-          'You are not logged in.'
-        );
-
-        showSection('login-section');
-        return;
-      }
-
-      if (
-        sessionStorage.getItem('signOutLocationVerified') !== 'true'
-      ) {
-        showMessage(
-          'signout-message',
-          'Your location has not been verified.'
-        );
-        return;
-      }
-
-      const btn =
-        document.getElementById('btn-signout-submit');
-
-      btn.disabled = true;
-      btn.textContent = 'Signing Out...';
-
-      try {
-
-        const signOutTime = new Date().toISOString();
-
-        const response =
-          await fetch(
-            signOutFlowUrl,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                Email: email,
-                StudentID: studentID,
-                FullName: name,
-                SignOutTime: signOutTime
-              })
-            }
-          );
-
-        if (!response.ok) {
-          throw new Error('Failed to save sign-out time');
-        }
-
-        let result = null;
-        const raw = await response.text();
-
-        if (raw) {
-          try {
-            result = JSON.parse(raw);
-          } catch (e) {
-            result = null;
-          }
-        }
-
-        // The Power Automate flow should return alreadySignedOut=true
-        // when today's SharePoint record already contains SignOutTime.
-        if (result && result.alreadySignedOut === true) {
-          showMessage(
-            'signout-message',
-            'You have already signed out for today.'
-          );
-          return;
-        }
-
-        if (result && result.success === false) {
-          showMessage(
-            'signout-message',
-            result.message || 'Sign-out could not be completed.'
-          );
-          return;
-        }
-
-        showSignOutSuccess();
-
-      } catch (err) {
-
-        showMessage(
-          'signout-message',
-          'Error: ' + err.message
-        );
-
-      } finally {
-
-        btn.disabled = false;
-        btn.textContent = 'Sign-Out';
-      }
     }
   );
 
@@ -2518,11 +2594,6 @@ function updateCurrentDateTime() {
 
 setInterval(
   updateCurrentDateTime,
-  1000
-);
-
-setInterval(
-  updateSignOutDateTime,
   1000
 );
 
