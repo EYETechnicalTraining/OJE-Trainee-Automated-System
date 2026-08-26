@@ -1,3 +1,236 @@
+Im creating flow for the button, I have created this far, so now what i want it to do is, to check the Attendance Record for that day and find this person's attendance using the StudentID, then write the triggerTime1 from the to a column named SignOutTime in the sharepoint. Use the Date and Time column to compare the date to find todays attendance. For your ref. Initialize Variable value = formatDateTime( 
+  addHours(triggerBody()?['SignOutTime'], 4),
+  'HH:mm'
+)
+Today 7:06 PM
+Pasted text(5).txt
+Document
+okay lets get back to it, below is the current code, what does the SignOut button currently do? 
+okay, lets proceed to build it then, first lets create the screen that appears after clicking that button, it operates same as taking attendance, it first access the location, if location is right it shows the details as it shows when the attendance access location is verified. then like the attendance page, give a button named Sign-Out, once the user clicks sign out, it displays, sign out successful, then give a back red button, which takes the user to main menu. but if the user tries to accesss the sign out again, if the user already has a SignOut stored in the sharepoint, it shld not let him access it, and  it has to reset everyday morning 6 AM UAE time. similar as attendance works. the sign out button after the main menu, we will build it once this part of the web is ready. I have attached the sharepoint screenshot which we can use to know the name of the column i.e. SignOutTime
+
+Yes. If Attendance location access works but Daily Sign-Out stays on “Accessing your location, please wait!”, the problem is almost certainly in the new Sign-Out location-gate function, not the browser's GPS itself.
+
+The safest fix is to make the Sign-Out location check use the exact same geolocation logic as Attendance, but with the Sign-Out radius of 10,000 km.
+
+Replace only your Sign-Out location function with this
+function verifyLocationGate_SignOut(){
+  showSection('signout-section');
+  setLocationText_SignOut('Accessing your location, please wait!');
+
+  if(!navigator.geolocation) {
+    setLocationText_SignOut('Unable to access location, please refresh!');
+    sessionStorage.setItem('signoutLocationVerified', 'false');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      const d = distanceMeters(lat, lng, AUTH_LAT, AUTH_LNG);
+
+      // Sign-Out radius = 10,000 km
+      const SIGNOUT_RADIUS_METERS = 10000000;
+
+      if(d <= SIGNOUT_RADIUS_METERS) {
+        sessionStorage.setItem('signoutLocationVerified', 'true');
+
+        // Location verified → show Sign-Out page
+        loadSignOutDetails();
+
+      } else {
+        sessionStorage.setItem('signoutLocationVerified', 'false');
+        setLocationText_SignOut('Please move to the authorized area');
+      }
+    },
+    (error) => {
+      sessionStorage.setItem('signoutLocationVerified', 'false');
+
+      if(error.code === error.PERMISSION_DENIED) {
+        setLocationText_SignOut('Location permission was denied. Please allow location access and try again.');
+      } else if(error.code === error.POSITION_UNAVAILABLE) {
+        setLocationText_SignOut('Unable to determine your location. Please try again.');
+      } else if(error.code === error.TIMEOUT) {
+        setLocationText_SignOut('Location request timed out. Please try again.');
+      } else {
+        setLocationText_SignOut('Unable to access location, please refresh!');
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+  );
+}
+
+And make sure you have this function:
+
+function setLocationText_SignOut(t){
+  const el = document.getElementById('signout-location-text');
+  if(el) el.textContent = t;
+}
+Most important part
+
+Your Daily Sign-Out button should call:
+
+document.getElementById('btn-dashboard-signout').addEventListener('click', async () => {
+  sessionStorage.setItem('signoutLocationVerified', 'false');
+  verifyLocationGate_SignOut();
+});
+
+Do not call the Attendance function here:
+
+verifyLocationGate_AttendanceOnly();
+
+because that function specifically proceeds to:
+
+showSection('attendance-section');
+loadAttendanceDetails();
+
+The Sign-Out button needs its own location gate and then its own Sign-Out page.
+
+Also check your Sign-Out HTML
+
+The location section must contain this exact ID:
+
+<div id="signout-section" class="hidden">
+  <div class="location-wrap">
+    <div class="pin"></div>
+    <div class="pin-shadow"></div>
+    <p id="signout-location-text" class="location-text">
+      Accessing your location, please wait!
+    </p>
+  </div>
+
+  <button id="btn-back-from-signout-location" class="red-btn">
+    Back
+  </button>
+</div>
+
+And your showSection() function must include:
+
+'signout-section'
+
+For example:
+
+function showSection(sectionId) {
+  [
+    'location-section',
+    'registration-section',
+    'otp-section',
+    'login-section',
+    'dashboard-section',
+    'attendance-section',
+    'attendance-result-section',
+    'taskcount-section',
+    'taskcount-success-section',
+    'aircraft-section',
+    'signout-section'
+  ].forEach(id => {
+    document.getElementById(id).style.display =
+      (id === sectionId) ? 'block' : 'none';
+  });
+
+  clearMessages();
+}
+One more important correction
+
+The 10,000 km radius is:
+
+10000000
+
+because the distance function returns meters.
+
+So:
+
+10,000 km × 1,000 = 10,000,000 meters
+
+With your authorized coordinates:
+
+const AUTH_LAT = 24.43631074997773;
+const AUTH_LNG = 54.633581449737385;
+
+almost any normal location will pass this check.
+
+The fact that it is stuck at “Accessing your location” means we need to make sure the browser's getCurrentPosition() callback is actually reaching the next step. The version above also gives you a specific error message if the browser denies, times out, or cannot determine the location, instead of leaving the user stuck indefinitely.
+
+If you paste the current full code containing the Sign-Out additions, I can pinpoint the exact line causing it and give you the full code with only that issue corrected, without changing your existing Attendance, Registration, Login, Aircraft Allocation, or Task Count operations.
+
+for sign out use this coordinates with radius of 5 Km 24.466103933929684, 54.37464484360332, now write me the full code with this change
+
+Yes. I updated the current code and kept the existing attendance location unchanged.
+
+Daily Sign-Out location now uses:
+Latitude: 24.466103933929684
+Longitude: 54.37464484360332
+Radius: 5 km (5000 metres)
+
+The Attendance location remains exactly as it was. The Sign-Out button now calls a separate location verification function, so changing the Sign-Out radius will not affect Attendance. The existing flow URLs and other operations were left untouched.
+
+I also kept the existing green Daily Sign-Out button unchanged.
+
+Full updated code:
+
+Download the updated full HTML code
+
+One important point: this change only makes the Sign-Out location verification work. Once the student's location is within the 5 km radius, it currently displays “Location verified successfully!” The SharePoint SignOutTime flow and the final Sign-Out screen are still separate steps, so we can build those next without disturbing this location logic.
+
+OJE_Attendance_System_SignOut_Location_Updated.html
+HTML
+Today 8:39 PM
+Pasted text(6).txt
+Document
+I want you to put that sign out setup into this code i changed some visual of my website, so insert the sign out into this code and write me the full code. 
+
+Yes. I’ve inserted the Daily Sign-Out setup into your current visual version while keeping the existing Attendance, Aircraft Allocation, Task Count, Login, Registration, OTP, logo, and other operations unchanged.
+
+The Sign-Out flow now works as:
+
+Dashboard → Daily Sign-Out
+Requests device location.
+Uses your specified Sign-Out location:
+Latitude: 24.466103933929684
+Longitude: 54.37464484360332
+Radius: 5 km
+If location is valid → opens the Daily Sign-Out page.
+Shows:
+Student ID
+Name
+Current date/time
+Sign-Out button
+Clicking Sign-Out sends:
+Email
+StudentID
+FullName
+SignOutTime
+If Power Automate reports that the student already signed out, the page displays “You have already signed out for today.”
+Otherwise → “Sign out successful.”
+A red Back button returns to the main menu.
+
+I also checked the resulting JavaScript syntax; it is valid.
+
+Full updated code
+
+Download the full updated HTML code
+
+One thing you must replace: I did not invent your new Power Automate URL because it isn't present in the current code. In the code, find:
+
+const signOutFlowUrl = "PASTE_YOUR_SIGNOUT_FLOW_URL_HERE";
+
+and replace the text with the HTTP URL generated by your “Save Exit Time to SharePoint” flow.
+
+Your existing code and flow URLs remain untouched.
+
+Also, for the duplicate protection to work properly, your Power Automate flow should return something like:
+
+{
+  "alreadySignedOut": true
+}
+
+when today's SharePoint record already has a SignOutTime. The code is already prepared to handle that.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -439,6 +672,59 @@
 
   </div>
 
+  <!-- DAILY SIGN-OUT -->
+  <div id="signout-section" class="hidden">
+
+    <h2 class="page-title">
+      Daily Sign-Out
+    </h2>
+
+    <span id="signout-current-datetime" class="hidden"></span>
+
+    <div class="info-card">
+
+      <div class="info-row">
+        <strong>ID:</strong>
+        <span id="signout-student-id"></span>
+      </div>
+
+      <div class="info-row">
+        <strong>Name:</strong>
+        <span id="signout-student-name"></span>
+      </div>
+
+      <div class="info-row">
+        <strong>Date & Time:</strong>
+        <span id="signout-datetime"></span>
+      </div>
+
+    </div>
+
+    <button id="btn-signout-submit" class="green-btn">
+      Sign-Out
+    </button>
+
+    <p id="signout-message" class="message hidden"></p>
+
+    <button id="btn-back-from-signout" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
+  <!-- DAILY SIGN-OUT SUCCESS -->
+  <div id="signout-success-section" class="hidden">
+
+    <p id="signout-success-message" class="message success">
+      ✅ Sign out successful.
+    </p>
+
+    <button id="btn-back-from-signout-success" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
   <!-- TASK COUNT SECTION -->
   <div id="taskcount-section" class="hidden">
 
@@ -661,6 +947,10 @@ const checkLoginCredentialsUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.
 
 const attendanceFlowUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/57c92940051d45378ca150defaf99c01/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uJxqo2979DyhYqKSo5GsqlVwWrNYq_Tn9LLDy9eFvcg";
 
+// === Daily Sign-Out Flow ===
+// Replace this with the HTTP URL generated by your Power Automate Sign-Out flow.
+const signOutFlowUrl = "PASTE_YOUR_SIGNOUT_FLOW_URL_HERE";
+
 const checkAttendanceTodayUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e6031c77c0b41f6a1ecefa8d727119a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=RQyxFSY-f9MYjhwsQ_j4ixc2BeRNskIcx1dRr2IHgSo";
 
 const getTaskCountUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/85dc1a9c07834f938c74cdde1f3f2978/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KFlDrPLxUmV2HA74dETukVis0W8-xJfhD5Bf5BB6iIQ";
@@ -697,6 +987,8 @@ function showSection(sectionId) {
     'dashboard-section',
     'attendance-section',
     'attendance-result-section',
+    'signout-section',
+    'signout-success-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -718,6 +1010,7 @@ function clearMessages() {
     'otp-message',
     'login-message',
     'attendance-message',
+    'signout-message',
     'taskcount-message',
     'aircraft-message'
   ].forEach(id => {
@@ -919,6 +1212,11 @@ function verifyLocationGate_SignOut() {
           'Location verified successfully!'
         );
 
+        setTimeout(() => {
+          showSection('signout-section');
+          loadSignOutDetails();
+        }, 500);
+
       } else {
 
         sessionStorage.setItem(
@@ -950,6 +1248,58 @@ function verifyLocationGate_SignOut() {
       maximumAge: 0
     }
   );
+}
+
+
+function loadSignOutDetails() {
+
+  const name =
+    sessionStorage.getItem('loggedInName');
+
+  const studentID =
+    sessionStorage.getItem('loggedInStudentID');
+
+  if (!studentID) {
+    showSection('login-section');
+    return;
+  }
+
+  document.getElementById('signout-student-id').textContent =
+    studentID || '';
+
+  document.getElementById('signout-student-name').textContent =
+    name || '';
+
+  updateSignOutDateTime();
+}
+
+
+function updateSignOutDateTime() {
+
+  const now = new Date();
+
+  const uaeTime = new Date(
+    now.toLocaleString('en-US', { timeZone: 'Asia/Dubai' })
+  );
+
+  const text = uaeTime.toLocaleString('en-GB', {
+    timeZone: 'Asia/Dubai',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
+  document.getElementById('signout-current-datetime').textContent = text;
+  document.getElementById('signout-datetime').textContent = text;
+}
+
+
+function showSignOutSuccess() {
+  showSection('signout-success-section');
 }
 
 
@@ -1851,7 +2201,11 @@ document
     'click',
     () => {
 
-      // Daily Sign-Out uses its own authorized location and radius.
+      sessionStorage.setItem(
+        'signOutLocationVerified',
+        'false'
+      );
+
       verifyLocationGate_SignOut();
     }
   );
@@ -1935,6 +2289,145 @@ document
       showSection(
         'dashboard-section'
       );
+    }
+  );
+
+
+// === DAILY SIGN-OUT BACK BUTTONS ===
+
+document
+  .getElementById('btn-back-from-signout')
+  .addEventListener(
+    'click',
+    () => {
+      showSection('dashboard-section');
+    }
+  );
+
+
+document
+  .getElementById('btn-back-from-signout-success')
+  .addEventListener(
+    'click',
+    () => {
+      showSection('dashboard-section');
+    }
+  );
+
+
+// === SUBMIT DAILY SIGN-OUT ===
+
+document
+  .getElementById('btn-signout-submit')
+  .addEventListener(
+    'click',
+    async () => {
+
+      clearMessages();
+
+      const email =
+        sessionStorage.getItem('loggedInEmail');
+
+      const studentID =
+        sessionStorage.getItem('loggedInStudentID');
+
+      const name =
+        sessionStorage.getItem('loggedInName');
+
+      if (!email || !studentID) {
+        showMessage(
+          'signout-message',
+          'You are not logged in.'
+        );
+
+        showSection('login-section');
+        return;
+      }
+
+      if (
+        sessionStorage.getItem('signOutLocationVerified') !== 'true'
+      ) {
+        showMessage(
+          'signout-message',
+          'Your location has not been verified.'
+        );
+        return;
+      }
+
+      const btn =
+        document.getElementById('btn-signout-submit');
+
+      btn.disabled = true;
+      btn.textContent = 'Signing Out...';
+
+      try {
+
+        const signOutTime = new Date().toISOString();
+
+        const response =
+          await fetch(
+            signOutFlowUrl,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                Email: email,
+                StudentID: studentID,
+                FullName: name,
+                SignOutTime: signOutTime
+              })
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error('Failed to save sign-out time');
+        }
+
+        let result = null;
+        const raw = await response.text();
+
+        if (raw) {
+          try {
+            result = JSON.parse(raw);
+          } catch (e) {
+            result = null;
+          }
+        }
+
+        // The Power Automate flow should return alreadySignedOut=true
+        // when today's SharePoint record already contains SignOutTime.
+        if (result && result.alreadySignedOut === true) {
+          showMessage(
+            'signout-message',
+            'You have already signed out for today.'
+          );
+          return;
+        }
+
+        if (result && result.success === false) {
+          showMessage(
+            'signout-message',
+            result.message || 'Sign-out could not be completed.'
+          );
+          return;
+        }
+
+        showSignOutSuccess();
+
+      } catch (err) {
+
+        showMessage(
+          'signout-message',
+          'Error: ' + err.message
+        );
+
+      } finally {
+
+        btn.disabled = false;
+        btn.textContent = 'Sign-Out';
+      }
     }
   );
 
@@ -2258,6 +2751,11 @@ function updateCurrentDateTime() {
 
 setInterval(
   updateCurrentDateTime,
+  1000
+);
+
+setInterval(
+  updateSignOutDateTime,
   1000
 );
 
