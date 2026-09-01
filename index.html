@@ -1015,11 +1015,17 @@ const updateAircraftAllocationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5
 
 const getAircraftAllocationUrl = "https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f34cc8a4fd422aa1ca016336294ab6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=sgADXqmYgYzEjXYSw4Tc-sWitB6w5EfOKm5Y9u9XtKI";
 
-// === Location Gate Settings ===
+// === Location Gate Settings - ATTENDANCE ===
 
-const AUTH_LAT = 24.466095787149264;
-const AUTH_LNG = 54.375443507070095;
-const AUTH_RADIUS_METERS = 5000;
+const ATTENDANCE_LAT = 24.43631074997773;
+const ATTENDANCE_LNG = 54.633581449737385;
+const ATTENDANCE_RADIUS_METERS = 100;
+
+// === Location Gate Settings - DAILY SIGN-OUT ===
+
+const SIGNOUT_LAT = 24.466095787149264;
+const SIGNOUT_LNG = 54.375443507070095;
+const SIGNOUT_RADIUS_METERS = 5000;
 
 
 // === Utility functions ===
@@ -1162,11 +1168,11 @@ function verifyLocationGate_AttendanceOnly() {
       const d = distanceMeters(
         lat,
         lng,
-        AUTH_LAT,
-        AUTH_LNG
+        ATTENDANCE_LAT,
+        ATTENDANCE_LNG
       );
 
-      if (d <= AUTH_RADIUS_METERS) {
+      if (d <= ATTENDANCE_RADIUS_METERS) {
 
         sessionStorage.setItem(
           'locationVerified',
@@ -1192,6 +1198,95 @@ function verifyLocationGate_AttendanceOnly() {
 
       sessionStorage.setItem(
         'locationVerified',
+        'false'
+      );
+
+      setLocationText(
+        'Unable to access location, please refresh!'
+      );
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+  );
+}
+
+
+function proceedAfterLocationCheck_SignOut() {
+
+  showSection('location-section');
+
+  setLocationText(
+    'Location verified for sign-out!'
+  );
+}
+
+
+function verifyLocationGate_SignOut() {
+
+  showSection('location-section');
+
+  setLocationText(
+    'Accessing your location, please wait!'
+  );
+
+  if (!navigator.geolocation) {
+
+    setLocationText(
+      'Unable to access location, please refresh!'
+    );
+
+    sessionStorage.setItem(
+      'signoutLocationVerified',
+      'false'
+    );
+
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    (pos) => {
+
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      const d = distanceMeters(
+        lat,
+        lng,
+        SIGNOUT_LAT,
+        SIGNOUT_LNG
+      );
+
+      if (d <= SIGNOUT_RADIUS_METERS) {
+
+        sessionStorage.setItem(
+          'signoutLocationVerified',
+          'true'
+        );
+
+        proceedAfterLocationCheck_SignOut();
+
+      } else {
+
+        sessionStorage.setItem(
+          'signoutLocationVerified',
+          'false'
+        );
+
+        setLocationText(
+          'Please move to the authorized sign-out area'
+        );
+      }
+    },
+
+    () => {
+
+      sessionStorage.setItem(
+        'signoutLocationVerified',
         'false'
       );
 
@@ -2167,8 +2262,8 @@ document
 
 
 // === DAILY SIGN-OUT BUTTON ===
-// Green button added to Dashboard.
-// No other existing functionality is changed.
+// Green button on Dashboard.
+// Uses SEPARATE coordinates from Attendance.
 
 document
   .getElementById('btn-dashboard-signout')
@@ -2176,19 +2271,12 @@ document
     'click',
     () => {
 
-      /*
-        Daily Sign-Out functionality can be connected here.
-        The button is intentionally kept separate from
-        the existing Attendance functionality.
-      */
-
-      showSection(
-        'location-section'
+      sessionStorage.setItem(
+        'signoutLocationVerified',
+        'false'
       );
 
-      setLocationText(
-        'Accessing your location, please wait!'
-      );
+      verifyLocationGate_SignOut();
     }
   );
 
