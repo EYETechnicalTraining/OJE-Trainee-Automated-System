@@ -1386,6 +1386,40 @@ function showSignOutResult(messageText) {
 }
 
 
+async function checkSignOutStatus(studentID) {
+
+  try {
+
+    const res =
+      await fetch(
+        'https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/31/workflows/3625d893382d404e8831166e43c10f47/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CO5S1BC3CIFhIx7YFTdbGODPQ7-5L88Y9QMMTukRzBs',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+          body: JSON.stringify({
+            StudentID: studentID
+          })
+        }
+      );
+
+    const result =
+      await res.json();
+
+    return result;
+
+  } catch (err) {
+
+    return {
+      status: 'error',
+      message: 'Error checking sign out status'
+    };
+  }
+}
+
+
 async function checkAttendanceTodayAndLock() {
 
   const studentID =
@@ -2481,6 +2515,55 @@ document
 
         return;
       }
+
+      // === CHECK SIGN OUT STATUS FIRST ===
+
+      const statusCheck =
+        await checkSignOutStatus(
+          studentID
+        );
+
+      if (
+        statusCheck.status === 'already_signed_out'
+      ) {
+
+        showMessage(
+          'signout-message',
+          'You have already signed out for the day',
+          true
+        );
+
+        return;
+      }
+
+      if (
+        statusCheck.status === 'no_attendance'
+      ) {
+
+        showMessage(
+          'signout-message',
+          'No Attendance found for today!',
+          true
+        );
+
+        return;
+      }
+
+      if (
+        statusCheck.status !== 'can_sign_out'
+      ) {
+
+        showMessage(
+          'signout-message',
+          statusCheck.message ||
+          'Error checking sign out status',
+          true
+        );
+
+        return;
+      }
+
+      // === PROCEED WITH SIGN OUT ===
 
       const signOutTime =
         new Date().toISOString();
