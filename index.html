@@ -1390,9 +1390,11 @@ async function checkSignOutStatus(studentID) {
 
   try {
 
+    console.log('Checking sign out status for:', studentID);
+
     const res =
       await fetch(
-        'https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/31/workflows/3625d893382d404e8831166e43c10f47/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CO5S1BC3CIFhIx7YFTdbGODPQ7-5L88Y9QMMTukRzBs',
+        'https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com/powerautomate/automations/direct/cu/31/workflows/3625d893382d404e8831166e43c10f47/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=CO5S1BC3CIFhIx7YFTdbGODPQ7-5L88Y9QMMTukRzBs',
         {
           method: 'POST',
           headers: {
@@ -1405,12 +1407,18 @@ async function checkSignOutStatus(studentID) {
         }
       );
 
+    console.log('Response status:', res.status);
+
     const result =
       await res.json();
+
+    console.log('Result:', result);
 
     return result;
 
   } catch (err) {
+
+    console.error('Error:', err);
 
     return {
       status: 'error',
