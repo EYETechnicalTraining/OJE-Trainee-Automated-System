@@ -2416,6 +2416,103 @@ document
   );
 
 
+// === SUBMIT SIGN OUT ===
+
+document
+  .getElementById('btn-submit-signout')
+  .addEventListener(
+    'click',
+    async () => {
+
+      clearMessages();
+
+      const studentID =
+        sessionStorage.getItem(
+          'loggedInStudentID'
+        );
+
+      if (!studentID) {
+
+        showMessage(
+          'signout-message',
+          'You are not logged in.',
+          true
+        );
+
+        return;
+      }
+
+      const signOutTime =
+        new Date().toISOString();
+
+      try {
+
+        const res =
+          await fetch(
+            'https://defaultc90d8d828a61421b9f8c35ab8bc5bc.9c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/17841bd7ef0846edb86f6ac1a230ad74/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ot4uyvJw9X9qxqNoVI63jTGdXvCyxGyqsc4rTzStMc4',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+              body: JSON.stringify({
+                StudentID: studentID,
+                SignOutTime: signOutTime
+              })
+            }
+          );
+
+        if (!res.ok) {
+          throw new Error(
+            'Sign out failed'
+          );
+        }
+
+        const result =
+          await res.json();
+
+        if (
+          result.status === 'success'
+        ) {
+
+          showMessage(
+            'signout-message',
+            '✅ Sign out recorded successfully!',
+            false
+          );
+
+          setTimeout(
+            () => {
+
+              showSection(
+                'dashboard-section'
+              );
+
+            },
+            1500
+          );
+
+        } else {
+
+          showMessage(
+            'signout-message',
+            result.message ||
+            'Failed to record sign out'
+          );
+        }
+
+      } catch (err) {
+
+        showMessage(
+          'signout-message',
+          'Error: ' + err.message
+        );
+      }
+    }
+  );
+
+
 // === SUBMIT TASK COUNT ===
 
 document
