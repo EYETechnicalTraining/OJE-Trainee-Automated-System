@@ -821,6 +821,17 @@
 
   </div>
 
+  <!-- SIGN-OUT RESULT PAGE -->
+  <div id="signout-result-section" class="hidden">
+
+    <p id="signout-result-message" class="message success"></p>
+
+    <button id="btn-back-from-signout-result" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
   <!-- TASK COUNT SECTION -->
   <div id="taskcount-section" class="hidden">
 
@@ -1081,6 +1092,7 @@ function showSection(sectionId) {
     'attendance-section',
     'attendance-result-section',
     'signout-section',
+    'signout-result-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -1355,6 +1367,21 @@ function showAttendanceResult(messageText) {
 
   showSection(
     'attendance-result-section'
+  );
+}
+
+
+function showSignOutResult(messageText) {
+
+  const msg =
+    document.getElementById(
+      'signout-result-message'
+    );
+
+  msg.textContent = messageText;
+
+  showSection(
+    'signout-result-section'
   );
 }
 
@@ -2391,6 +2418,19 @@ document
 
 
 document
+  .getElementById('btn-back-from-signout-result')
+  .addEventListener(
+    'click',
+    () => {
+
+      showSection(
+        'dashboard-section'
+      );
+    }
+  );
+
+
+document
   .getElementById('btn-back-from-taskcount')
   .addEventListener(
     'click',
@@ -2463,12 +2503,6 @@ document
             }
           );
 
-        if (!res.ok) {
-          throw new Error(
-            'Sign out failed'
-          );
-        }
-
         const result =
           await res.json();
 
@@ -2476,21 +2510,8 @@ document
           result.status === 'success'
         ) {
 
-          showMessage(
-            'signout-message',
-            '✅ Sign out recorded successfully!',
-            false
-          );
-
-          setTimeout(
-            () => {
-
-              showSection(
-                'dashboard-section'
-              );
-
-            },
-            1500
+          showSignOutResult(
+            '✅ Sign out recorded successfully!'
           );
 
         } else {
