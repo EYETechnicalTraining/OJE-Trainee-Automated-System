@@ -781,6 +781,46 @@
 
   </div>
 
+  <!-- SIGN-OUT -->
+  <div id="signout-section" class="hidden">
+
+    <h2 class="page-title">
+      Sign-Out
+    </h2>
+
+    <span id="signout-datetime" class="hidden"></span>
+
+    <div class="info-card">
+
+      <div class="info-row">
+        <strong>ID:</strong>
+        <span id="signout-id"></span>
+      </div>
+
+      <div class="info-row">
+        <strong>Name:</strong>
+        <span id="signout-name"></span>
+      </div>
+
+      <div class="info-row">
+        <strong>Date & Time:</strong>
+        <span id="signout-time"></span>
+      </div>
+
+    </div>
+
+    <button id="btn-submit-signout">
+      Sign Out
+    </button>
+
+    <p id="signout-message" class="message hidden"></p>
+
+    <button id="btn-back-from-signout" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
   <!-- TASK COUNT SECTION -->
   <div id="taskcount-section" class="hidden">
 
@@ -1040,6 +1080,7 @@ function showSection(sectionId) {
     'dashboard-section',
     'attendance-section',
     'attendance-result-section',
+    'signout-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -1061,6 +1102,7 @@ function clearMessages() {
     'otp-message',
     'login-message',
     'attendance-message',
+    'signout-message',
     'taskcount-message',
     'aircraft-message'
   ].forEach(id => {
@@ -1217,11 +1259,9 @@ function verifyLocationGate_AttendanceOnly() {
 
 function proceedAfterLocationCheck_SignOut() {
 
-  showSection('location-section');
+  showSection('signout-section');
 
-  setLocationText(
-    'Location verified for sign-out!'
-  );
+  loadSignOutDetails();
 }
 
 
@@ -2338,6 +2378,19 @@ document
 
 
 document
+  .getElementById('btn-back-from-signout')
+  .addEventListener(
+    'click',
+    () => {
+
+      showSection(
+        'dashboard-section'
+      );
+    }
+  );
+
+
+document
   .getElementById('btn-back-from-taskcount')
   .addEventListener(
     'click',
@@ -2643,6 +2696,92 @@ function loadAttendanceDetails() {
 }
 
 
+// === Load Sign-Out Details ===
+
+function loadSignOutDetails() {
+
+  const email =
+    sessionStorage.getItem(
+      'loggedInEmail'
+    );
+
+  const name =
+    sessionStorage.getItem(
+      'loggedInName'
+    );
+
+  const studentID =
+    sessionStorage.getItem(
+      'loggedInStudentID'
+    );
+
+  if (!email) {
+
+    showSection(
+      'login-section'
+    );
+
+    return;
+  }
+
+  document.getElementById(
+    'signout-name'
+  ).textContent =
+    name || '';
+
+  document.getElementById(
+    'signout-id'
+  ).textContent =
+    studentID || '';
+
+  document.getElementById(
+    'signout-time'
+  ).textContent =
+    document.getElementById(
+      'signout-datetime'
+    ).textContent;
+
+  updateSignOutDateTime();
+}
+
+
+function updateSignOutDateTime() {
+
+  const now =
+    new Date();
+
+  const uaeTime =
+    new Date(
+      now.getTime()
+    );
+
+  document.getElementById(
+    'signout-datetime'
+  ).textContent =
+    uaeTime.toLocaleString();
+
+  if (
+    document.getElementById(
+      'signout-section'
+    ).style.display !== 'none'
+  ) {
+
+    const dtEl =
+      document.getElementById(
+        'signout-time'
+      );
+
+    if (dtEl) {
+
+      dtEl.textContent =
+        document.getElementById(
+          'signout-datetime'
+        ).textContent;
+    }
+  }
+}
+
+
 function updateCurrentDateTime() {
 
   const now =
@@ -2681,7 +2820,10 @@ function updateCurrentDateTime() {
 
 
 setInterval(
-  updateCurrentDateTime,
+  () => {
+    updateCurrentDateTime();
+    updateSignOutDateTime();
+  },
   1000
 );
 
