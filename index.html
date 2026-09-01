@@ -821,6 +821,19 @@
 
   </div>
 
+  <!-- ALREADY SIGNED OUT SCREEN -->
+  <div id="already-signout-section" class="hidden">
+
+    <p id="already-signout-message" class="message error">
+      You have already signed out for today
+    </p>
+
+    <button id="btn-back-from-already-signout" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
   <!-- SIGN-OUT RESULT PAGE -->
   <div id="signout-result-section" class="hidden">
 
@@ -1093,6 +1106,7 @@ function showSection(sectionId) {
     'attendance-result-section',
     'signout-section',
     'signout-result-section',
+    'already-signout-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -2372,20 +2386,72 @@ document
 
 // === DAILY SIGN-OUT BUTTON ===
 // Green button on Dashboard.
-// Uses SEPARATE coordinates from Attendance.
+// Checks sign-out status FIRST before location verification.
 
 document
   .getElementById('btn-dashboard-signout')
   .addEventListener(
     'click',
-    () => {
+    async () => {
 
-      sessionStorage.setItem(
-        'signoutLocationVerified',
-        'false'
-      );
+      const studentID =
+        sessionStorage.getItem(
+          'loggedInStudentID'
+        );
 
-      verifyLocationGate_SignOut();
+      if (!studentID) {
+
+        showMessage(
+          'signout-message',
+          'You are not logged in.',
+          true
+        );
+
+        return;
+      }
+
+      // === CHECK SIGN OUT STATUS FIRST ===
+
+      const statusCheck =
+        await checkSignOutStatus(
+          studentID
+        );
+
+      if (
+        statusCheck.status === 'already_signed_out'
+      ) {
+
+        showSection(
+          'already-signout-section'
+        );
+
+        return;
+      }
+
+      if (
+        statusCheck.status === 'no_attendance'
+      ) {
+
+        showMessage(
+          'dashboard-section',
+          'No Attendance found for today!',
+          true
+        );
+
+        return;
+      }
+
+      if (
+        statusCheck.status === 'can_sign_out'
+      ) {
+
+        sessionStorage.setItem(
+          'signoutLocationVerified',
+          'false'
+        );
+
+        verifyLocationGate_SignOut();
+      }
     }
   );
 
@@ -2473,6 +2539,19 @@ document
 
 
 document
+  .getElementById('btn-back-from-already-signout')
+  .addEventListener(
+    'click',
+    () => {
+
+      showSection(
+        'dashboard-section'
+      );
+    }
+  );
+
+
+document
   .getElementById('btn-back-from-taskcount')
   .addEventListener(
     'click',
@@ -2518,53 +2597,6 @@ document
         showMessage(
           'signout-message',
           'You are not logged in.',
-          true
-        );
-
-        return;
-      }
-
-      // === CHECK SIGN OUT STATUS FIRST ===
-
-      const statusCheck =
-        await checkSignOutStatus(
-          studentID
-        );
-
-      if (
-        statusCheck.status === 'already_signed_out'
-      ) {
-
-        showMessage(
-          'signout-message',
-          'You have already signed out for the day',
-          true
-        );
-
-        return;
-      }
-
-      if (
-        statusCheck.status === 'no_attendance'
-      ) {
-
-        showMessage(
-          'signout-message',
-          'No Attendance found for today!',
-          true
-        );
-
-        return;
-      }
-
-      if (
-        statusCheck.status !== 'can_sign_out'
-      ) {
-
-        showMessage(
-          'signout-message',
-          statusCheck.message ||
-          'Error checking sign out status',
           true
         );
 
