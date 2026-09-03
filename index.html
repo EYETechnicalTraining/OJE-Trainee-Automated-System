@@ -834,6 +834,19 @@
 
   </div>
 
+  <!-- NO ATTENDANCE TODAY SCREEN -->
+  <div id="no-attendance-section" class="hidden">
+
+    <p id="no-attendance-message" class="message error">
+      No Attendance found for today
+    </p>
+
+    <button id="btn-back-from-no-attendance" class="red-btn">
+      Back
+    </button>
+
+  </div>
+
   <!-- SIGN-OUT RESULT PAGE -->
   <div id="signout-result-section" class="hidden">
 
@@ -1107,6 +1120,7 @@ function showSection(sectionId) {
     'signout-section',
     'signout-result-section',
     'already-signout-section',
+    'no-attendance-section',
     'taskcount-section',
     'taskcount-success-section',
     'aircraft-section'
@@ -2432,10 +2446,8 @@ document
         statusCheck.status === 'no_attendance'
       ) {
 
-        showMessage(
-          'dashboard-section',
-          'No Attendance found for today!',
-          true
+        showSection(
+          'no-attendance-section'
         );
 
         return;
@@ -2540,6 +2552,19 @@ document
 
 document
   .getElementById('btn-back-from-already-signout')
+  .addEventListener(
+    'click',
+    () => {
+
+      showSection(
+        'dashboard-section'
+      );
+    }
+  );
+
+
+document
+  .getElementById('btn-back-from-no-attendance')
   .addEventListener(
     'click',
     () => {
